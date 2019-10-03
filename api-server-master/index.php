@@ -2,6 +2,7 @@
 	require './pdos/DatabasePdo.php';
 	require './pdos/IndexPdo.php';
 	require './pdos/UserPdo.php';
+	require './pdos/StoryPdo.php';
 
 	require './vendor/autoload.php';
 
@@ -27,6 +28,17 @@
 		$r->addRoute('GET'		, '/user'						, ['UserController', 'userList']);
 		$r->addRoute('POST'		, '/login'						, ['UserController', 'loginUser']);
 		$r->addRoute('POST'		, '/user'						, ['UserController', 'addUser']);
+		$r->addRoute('GET'		, '/user/{userId}'				, ['UserController', 'detailUser']);
+		$r->addRoute('DELETE'	, '/user/{userId}'				, ['UserController', 'deleteUser']);
+		$r->addRoute('PATCH'	, '/user/{userId}'				, ['UserController', 'updataUser']);
+		$r->addRoute('POST'		, '/user/{userId}/following'	, ['UserController', 'followUser']);
+		$r->addRoute('DELETE'	, '/user/{userId}/following'	, ['UserController', 'deleteFollowUser']);
+		$r->addRoute('POST'		, '/user/{userId}/block'		, ['UserController', 'blockUser']);
+		$r->addRoute('DELETE'	, '/user/{userId}/block'		, ['UserController', 'deleteBlockUser']);
+		$r->addRoute('GET'		, '/user/{userId}/follower'		, ['UserController', 'followerUser']);
+		$r->addRoute('GET'		, '/user/{userId}/following'	, ['UserController', 'followingUser']);
+		
+		$r->addRoute('POST'		, '/user/{userId}/story'						, ['StoryController', 'addStory']);
 		
 
 	//    $r->addRoute('GET', '/users', 'get_all_users_handler');
@@ -89,6 +101,11 @@
 					$handler = $routeInfo[1][1];
 					$vars = $routeInfo[2];
 					require './controllers/UserController.php';
+					break;
+				case 'StoryController':
+					$handler = $routeInfo[1][1];
+					$vars = $routeInfo[2];
+					require './controllers/StoryController.php';
 					break;
 				/*case 'EventController':
 					$handler = $routeInfo[1][1]; $vars = $routeInfo[2];

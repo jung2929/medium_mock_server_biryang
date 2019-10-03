@@ -29,7 +29,6 @@ try {
          * 마지막 수정 날짜 : 19.10.03
          */
         case "addUser":
-		
 			$check_email = preg_match("/^[_\.0-9a-zA-Z-]+@([0-9a-zA-Z][0-9a-zA-Z-]+\.)+[a-zA-Z]{2,6}$/i", $req->email);
 			
 			if($check_email==false) {
@@ -112,6 +111,153 @@ try {
             echo json_encode($res, JSON_NUMERIC_CHECK);
             break;
 			
+		/*
+         * API No. 4
+         * API Name : USER DETAIL API
+         * 마지막 수정 날짜 : 19.10.04
+         */			
+		case "detailUser":
+            http_response_code(200);
+            $res->result = detailUser((int)$vars["userId"]);
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "유저 조회 성공";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;				
+		
+		/*
+         * API No. 5
+         * API Name : USER UPDATA API
+         * 마지막 수정 날짜 : 19.10.04
+         */			
+		case "updataUser":
+			http_response_code(200);
+            updataUser($vars["userId"], $req->name, $req->about, $req->image);
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "회원정보 수정 성공";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;
+			
+		/*
+         * API No. 6
+         * API Name : USER FOLLOW ADD API
+         * 마지막 수정 날짜 : 19.10.04
+         */
+        case "followUser":
+			if(!empty(overlapCheckFollowUser($vars["userId"], $req->followingId))) {
+				$res->isSuccess = FALSE;
+                $res->code = 202;
+                $res->message = $res->message . "중복된 데이터가 있습니다.";
+			
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			};
+		
+            http_response_code(200);
+            followUser($vars["userId"], $req->followingId);
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "팔로우 추가 성공";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;
+		
+		/*
+         * API No. 7
+         * API Name : USER FOLLOW DELETE API
+         * 마지막 수정 날짜 : 19.10.04
+         */
+        case "deleteFollowUser":
+            http_response_code(200);
+            deleteFollowUser($vars["userId"], $req->followingId);
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "팔로우 삭제 성공";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;
+			
+		/*
+         * API No. 8
+         * API Name : USER FOLLOWING LIST API
+         * 마지막 수정 날짜 : 19.09.20
+         */			
+		case "followingUser":
+            http_response_code(200);
+            $res->result = followingUser($vars["userId"]);
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "팔로잉 조회 성공";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;	
+			
+		/*
+         * API No. 9
+         * API Name : USER FOLLOWER LIST API
+         * 마지막 수정 날짜 : 19.09.20
+         */			
+		case "followerUser":
+            http_response_code(200);
+            $res->result = followerUser($vars["userId"]);
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "팔로워 조회 성공";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;	
+			
+		/*
+         * API No. 10
+         * API Name : USER BLOCK API
+         * 마지막 수정 날짜 : 19.10.04
+         */			
+		case "blockUser":
+			if(!empty(overlapCheckBlockUser($vars["userId"], $req->blockId))) {
+				$res->isSuccess = FALSE;
+                $res->code = 202;
+                $res->message = $res->message . "중복된 데이터가 있습니다.";
+			
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			};
+            http_response_code(200);
+            blockUser($vars["userId"], $req->blockId);
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "유저 차단 추가";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;	
+		
+/*
+         * API No. 11
+         * API Name : USER BLOCK DELETE API
+         * 마지막 수정 날짜 : 19.10.04
+         */
+        case "deleteBlockUser":
+			
+            http_response_code(200);
+            deleteBlockUser($vars["userId"], $req->blockId);
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "유저 차단 삭제";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;		
+		
+			
+		/*
+         * API No. 12
+         * API Name : USER DELETE API
+         * 마지막 수정 날짜 : 19.10.04
+         */
+        case "deleteUser":
+			http_response_code(200);
+            deleteUser($vars["userId"]);
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "회원삭제 성공";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;
+		
     }
 } catch (\Exception $e) {
     return getSQLErrorException($errorLogs, $e, $req);
