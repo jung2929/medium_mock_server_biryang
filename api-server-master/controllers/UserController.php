@@ -32,18 +32,18 @@ try {
 			$check_email = preg_match("/^[_\.0-9a-zA-Z-]+@([0-9a-zA-Z][0-9a-zA-Z-]+\.)+[a-zA-Z]{2,6}$/i", $req->email);
 			
 			if($check_email==false) {
-				$res->message = $res->message . "<email> 잘못된 이메일 형식입니다.";
+				$res->isSuccess = FALSE;
+				$res->message = "<email> 잘못된 이메일 형식입니다.".$res->message;
 				$res->code = 201;
 			}
 			if(empty($req->name)) {
-				$res->message = $res->message . "<name> 공백입니다.";
+				$res->isSuccess = FALSE;
+				$res->message = "<name> 공백입니다.".$res->message;
 				$res->code = 201;
 			}
 			
 			if($res->code == 201){		
-				$res->isSuccess = FALSE;
-                $res->code = 201;
-                $res->message = $res->message . "회원가입 실패 : 유효하지 않은 형식";
+                $res->message = "유저 가입 실패 : " . $res->message;
 			
 				echo json_encode($res, JSON_NUMERIC_CHECK);
 				addErrorLogs($errorLogs, $res, $req);
@@ -53,7 +53,7 @@ try {
 			if(!empty(overlapCheckUser($req->email))) {
 				$res->isSuccess = FALSE;
                 $res->code = 202;
-                $res->message = $res->message . "회원가입 실패 : 중복";
+                $res->message = "유저 가입 실패 : 중복";
 			
 				echo json_encode($res, JSON_NUMERIC_CHECK);
 				addErrorLogs($errorLogs, $res, $req);
@@ -64,7 +64,7 @@ try {
             addUser($req->email, $req->name, $req->about, $req->image);
             $res->isSuccess = TRUE;
             $res->code = 100;
-            $res->message = "회원가입가입 성공";
+            $res->message = "유저가입 성공";
             echo json_encode($res, JSON_NUMERIC_CHECK);
             break;
 			
@@ -104,10 +104,31 @@ try {
          */			
 		case "userList":
             http_response_code(200);
+			
+			if($req->pageNum < 0) {
+				$res->isSuccess = FALSE;
+                $res->code = 201;
+                $res->message = "<pageNum> 0이하입니다." . $res->message;
+			}
+			if($req->pageCnt >= 50){		
+				$res->isSuccess = FALSE;
+                $res->code = 201;
+                $res->message = "<pageCnt> 50이상입니다." . $res->message;
+			}
+			if($res->code == 201){		
+				$res->isSuccess = FALSE;
+                $res->code = 201;
+                $res->message = "조회 실패 : " . $res->message;
+			
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
+			
             $res->result = userList($req->pageNum, $req->pageCnt);
             $res->isSuccess = TRUE;
             $res->code = 100;
-            $res->message = "전체 조회 성공";
+            $res->message = $req->pageNum . "페이지 조회 성공";
             echo json_encode($res, JSON_NUMERIC_CHECK);
             break;
 			
@@ -135,7 +156,7 @@ try {
             updataUser($vars["userId"], $req->name, $req->about, $req->image);
             $res->isSuccess = TRUE;
             $res->code = 100;
-            $res->message = "회원정보 수정 성공";
+            $res->message = "유저 정보 수정 성공";
             echo json_encode($res, JSON_NUMERIC_CHECK);
             break;
 			
@@ -228,7 +249,7 @@ try {
             echo json_encode($res, JSON_NUMERIC_CHECK);
             break;	
 		
-/*
+		/*
          * API No. 11
          * API Name : USER BLOCK DELETE API
          * 마지막 수정 날짜 : 19.10.04
@@ -243,9 +264,23 @@ try {
             echo json_encode($res, JSON_NUMERIC_CHECK);
             break;		
 		
+		/*
+         * API No. 12 
+         * API Name : USER BLOCK LIST API
+         * 마지막 수정 날짜 : 19.10.04
+         */
+        case "blockUserList":
+            http_response_code(200);
+            $res->result = blockUserList($vars["userId"]);
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "유저 차단 삭제";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;		
+		
 			
 		/*
-         * API No. 12
+         * API No. 13
          * API Name : USER DELETE API
          * 마지막 수정 날짜 : 19.10.04
          */
@@ -254,7 +289,7 @@ try {
             deleteUser($vars["userId"]);
             $res->isSuccess = TRUE;
             $res->code = 100;
-            $res->message = "회원삭제 성공";
+            $res->message = "유저 삭제 성공";
             echo json_encode($res, JSON_NUMERIC_CHECK);
             break;
 		
