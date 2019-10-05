@@ -26,7 +26,7 @@ try {
 		/*
          * API No. 1
          * API Name : TOPIC ADD API
-         * 마지막 수정 날짜 : 19.10.04
+         * 마지막 수정 날짜 : 19.10.06
          */
         case "addTopic":
 			http_response_code(200);
@@ -37,14 +37,41 @@ try {
             echo json_encode($res, JSON_NUMERIC_CHECK);
             break;
 		
-			
 		/*
          * API No. 2
-         * API Name : USER FOLLOW ADD API
-         * 마지막 수정 날짜 : 19.10.04
+         * API Name : TOPIC DELETE API
+         * 마지막 수정 날짜 : 19.10.06
+         */
+        case "deleteTopic":
+            http_response_code(200);
+            deleteTopic($req->topicId, $vars["userId"]);
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "토픽 삭제 성공";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;
+			
+		/*
+         * API No. 3
+         * API Name : TOPIC ADD API
+         * 마지막 수정 날짜 : 19.10.06
+         */
+        case "readTopic":
+			http_response_code(200);
+            $res->result = readTopic();
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "토픽 추가 성공";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;
+		
+			
+		/*
+         * API No. 4
+         * API Name : TOPIC FOLLOW ADD API
+         * 마지막 수정 날짜 : 19.10.06
          */
         case "followTopic":
-		
             http_response_code(200);
             followTopic($req->topicId, $vars["userId"]);
             $res->isSuccess = TRUE;
@@ -54,19 +81,32 @@ try {
             break;
 		
 		/*
-         * API No. 3
-         * API Name : USER FOLLOW DELETE API
-         * 마지막 수정 날짜 : 19.10.04
+         * API No. 5
+         * API Name : TOPIC FOLLOW DELETE API
+         * 마지막 수정 날짜 : 19.10.06
          */
-        case "deleteFollowUser":
+        case "deleteFollowTopic":
             http_response_code(200);
-            deleteFollowUser($vars["userId"], $req->followingId);
+            deleteFollowTopic($req->topicId, $vars["userId"]);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "팔로우 삭제 성공";
             echo json_encode($res, JSON_NUMERIC_CHECK);
             break;
-			
+		
+		/*
+         * API No. 6
+         * API Name : TOPIC FOLLOW READ API
+         * 마지막 수정 날짜 : 19.10.06
+         */
+        case "readFollowTopic":
+            http_response_code(200);
+            $res->result = readFollowTopic($vars["userId"]);
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "조회 성공";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;
     }
 } catch (\Exception $e) {
     return getSQLErrorException($errorLogs, $e, $req);
