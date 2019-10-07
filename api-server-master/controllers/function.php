@@ -26,16 +26,17 @@ function isValidHeader($jwt, $key)
         //return isValidJWToken($data->id, $data->pw, $jwt);
 		
 		$pdo = pdoSqlConnect();
-		$query = "SELECT * FROM user WHERE userId = ? AND (email = ? OR cellPhone = ?) AND password = ? AND del = 'N'";
+		$query = "SELECT * FROM user WHERE userId = ? AND email = ? AND del = 'N'";
 
 		$st = $pdo->prepare($query);
-		$st->execute([$data->userId, $data->email, $data->cellPhone, $data->password]);
+		$st->execute([$data->userId, $data->email]);
 		
 		$st->setFetchMode(PDO::FETCH_ASSOC);
 		$res = $st->fetchAll();
 		
-		if(empty($res))
+		if(empty($res)) {
 			return false;
+		}
 		else
 			return $data->userId;
 		

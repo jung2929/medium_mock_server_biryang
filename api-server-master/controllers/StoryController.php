@@ -29,11 +29,20 @@ try {
          * 마지막 수정 날짜 : 19.10.04
          */
         case "addAllStory":
-			//$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			
+			if (!isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}		
 			
 			http_response_code(200);
 			
-            addAllStory($req->userId, $req->title,$req->subTitle, $req->topicId, $req->contents);
+            addAllStory(isValidHeader($jwt, JWT_SECRET_KEY), $req->title,$req->subTitle, $req->topicId, $req->contents);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "스토리 추가 성공";
@@ -46,11 +55,27 @@ try {
          * 마지막 수정 날짜 : 19.10.04
          */
         case "addStory":
-			//$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			
+			if (!isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
+			
+			if(empty($req->title)) {
+				$res->isSuccess = FALSE;
+				$res->message = "작성 실패 : <title> 공백입니다.".$res->message;
+				$res->code = 201;
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				return;
+			}
 			
 			http_response_code(200);
-			
-            $res->storyId = addStory($req->userId, $req->title, $req->subTitle, $req->topicId);
+            $res->storyId = addStory(isValidHeader($jwt, JWT_SECRET_KEY), $req->title, $req->subTitle, $req->topicId);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "스토리 추가 성공";
@@ -63,7 +88,24 @@ try {
          * 마지막 수정 날짜 : 19.10.05
          */
         case "addText":
-			//$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			
+			if (!isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
+			
+			if(empty($req->text)) {
+				$res->isSuccess = FALSE;
+				$res->message = "작성 실패 : <text> 공백입니다.".$res->message;
+				$res->code = 201;
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				return;
+			}
 			
 			http_response_code(200);
 			
@@ -80,7 +122,24 @@ try {
          * 마지막 수정 날짜 : 19.10.05
          */
         case "addTextList":
-			//$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			
+			if (!isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
+			
+			if(empty($req->textList)) {
+				$res->isSuccess = FALSE;
+				$res->message = "작성 실패 : <textList> 공백입니다.";
+				$res->code = 201;
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				return;
+			}
 			
 			http_response_code(200);
 			
@@ -97,7 +156,24 @@ try {
          * 마지막 수정 날짜 : 19.10.05
          */
         case "addImage":
-			//$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			
+			if (!isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
+			
+			if(empty($req->image)) {
+				$res->isSuccess = FALSE;
+				$res->message = "작성 실패 : <image> 공백입니다.";
+				$res->code = 201;
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				return;
+			}
 			
 			http_response_code(200);
 			
@@ -114,7 +190,24 @@ try {
          * 마지막 수정 날짜 : 19.10.05
          */
         case "addQuotation":
-			//$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			
+			if (!isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
+			
+			if(empty($req->quotation)) {
+				$res->isSuccess = FALSE;
+				$res->message = "작성 실패 : <quotation> 공백입니다.";
+				$res->code = 201;
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				return;
+			}
 			
 			http_response_code(200);
 			
@@ -131,7 +224,25 @@ try {
          * 마지막 수정 날짜 : 19.10.05
          */
         case "addDelimiter":
-			//$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			
+			if (!isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
+			
+			
+			if(empty($req->delimiter)) {
+				$res->isSuccess = FALSE;
+				$res->message = "작성 실패 : <delimiter> 공백입니다.";
+				$res->code = 201;
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				return;
+			}
 			
 			http_response_code(200);
 			
@@ -148,8 +259,7 @@ try {
          * 마지막 수정 날짜 : 19.10.05
          */
         case "readStory":
-			//$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
-			
+	
 			http_response_code(200);
 			
             $res->storyId = readStory($vars["storyId"]);
