@@ -2,14 +2,14 @@
 	require './pdos/DatabasePdo.php';
 	require './pdos/IndexPdo.php';
 	require './pdos/UserPdo.php';
-	require './pdos/PostPdo.php';
+	require './pdos/RedingListPdo.php';
 	require './pdos/CommentPdo.php';
 	require './pdos/StoryPdo.php';
 	require './pdos/ShowPdo.php';
 	require './pdos/TopicPdo.php';
 	require './pdos/ClapPdo.php';
 	
-	require './vendor/autoload.php';
+	require './vendor/autoload.php'; 
 
 	use \Monolog\Logger as Logger;
 	use Monolog\Handler\StreamHandler;
@@ -46,30 +46,32 @@
 		$r->addRoute('GET'		, '/user/{userId}/block'					, ['UserController', 'blockUserList']);
 		
 		$r->addRoute('POST'		, '/story'									, ['StoryController', 'addStory']);
-		$r->addRoute('POST'		, '/story/{storyId}/text'					, ['StoryController', 'addText']);
-		$r->addRoute('POST'		, '/story/{storyId}/textList'				, ['StoryController', 'addTextList']);
-		$r->addRoute('POST'		, '/story/{storyId}/image'					, ['StoryController', 'addImage']);
-		$r->addRoute('POST'		, '/story/{storyId}/quotation'				, ['StoryController', 'addQuotation']);
-		$r->addRoute('POST'		, '/story/{storyId}/delimiter'				, ['StoryController', 'addDelimiter']);
+		$r->addRoute('POST'		, '/story/{storyId}/contents'				, ['StoryController', 'addContents']);
 		$r->addRoute('GET'		, '/story/{storyId}'						, ['StoryController', 'readStory']);
 		$r->addRoute('DELETE'	, '/story/{storyId}'						, ['StoryController', 'deleteStory']);
 		
 		$r->addRoute('GET'		, '/story'									, ['ShowController', 'recentlyStory']);
+		$r->addRoute('GET'		, '/recentlylist'							, ['ShowController', 'recentlyList']);
 		$r->addRoute('GET'		, '/story/{storyId}/clap'					, ['ClapController', 'addClap']);
 			
 		$r->addRoute('POST'		, '/topic'									, ['TopicController', 'addTopic']);
-		$r->addRoute('GET'		, '/topic'									, ['TopicController', 'readTopic']);
 		$r->addRoute('DELETE'	, '/topic'									, ['TopicController', 'deleteTopic']);
-		$r->addRoute('POST'		, '/user/{userId}/topic'					, ['TopicController', 'followTopic']);
-		$r->addRoute('GET'		, '/user/{userId}/topic'					, ['TopicController', 'readFollowTopic']);
-		$r->addRoute('DELETE'	, '/user/{userId}/topic'					, ['TopicController', 'deleteFollowTopic']);
+		$r->addRoute('GET'		, '/topic'									, ['TopicController', 'readTopic']);
+		$r->addRoute('POST'		, '/topic/{topicId}'						, ['TopicController', 'followTopic']);
+		$r->addRoute('DELETE'	, '/topic/{topicId}'						, ['TopicController', 'deleteFollowTopic']);
 		
-		$r->addRoute('POST'		, '/comment'				, ['CommentController', 'addComment']);
-		$r->addRoute('DELETE'	, '/comment/{commentId}'	, ['CommentController', 'deleteComment']);
-		$r->addRoute('PATCH'	, '/comment/{commentId}'	, ['CommentController', 'updataComment']);
-		$r->addRoute('GET'		, '/comment'				, ['CommentController', 'readStoryComment']);
-		$r->addRoute('GET'		, '/comment/{commentId}'	, ['CommentController', 'readComment']);
+		$r->addRoute('POST'		, '/comment'								, ['CommentController', 'addComment']);
+		$r->addRoute('DELETE'	, '/comment/{commentId}'					, ['CommentController', 'deleteComment']);
+		$r->addRoute('PATCH'	, '/comment/{commentId}'					, ['CommentController', 'updataComment']);
+		$r->addRoute('GET'		, '/comment'								, ['CommentController', 'readStoryComment']);
+		$r->addRoute('GET'		, '/comment/{commentId}'					, ['CommentController', 'readComment']);
 	
+	
+		$r->addRoute('POST'		, '/readinglist'								, ['RedingListController', 'addReadingList']);
+		$r->addRoute('PATCH'	, '/readinglist/{readingListId}'				, ['RedingListController', 'archiveReadingList']);
+		$r->addRoute('DELETE'	, '/readinglist/{readingListId}'				, ['RedingListController', 'deleteReadingList']);
+		$r->addRoute('GET'		, '/readinglist'								, ['RedingListController', 'readReadingList']);
+		
 	//    $r->addRoute('GET', '/users', 'get_all_users_handler');
 	//    // {id} must be a number (\d+)
 	//    $r->addRoute('GET', '/user/{id:\d+}', 'get_user_handler');
@@ -131,10 +133,10 @@
 					$vars = $routeInfo[2];
 					require './controllers/UserController.php';
 					break;
-				case 'PostController':
+				case 'RedingListController':
 					$handler = $routeInfo[1][1];
 					$vars = $routeInfo[2];
-					require './controllers/PostController.php';
+					require './controllers/RedingListController.php';
 					break;	
 				case 'CommentController':
 					$handler = $routeInfo[1][1];

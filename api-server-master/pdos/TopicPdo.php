@@ -24,16 +24,24 @@
 	}
 	
 	//READ TOPIC
-	function readTopic(){
+	function readTopic($userId, $pageNum, $pageCnt){
+		$pageNum = ($pageNum - 1) * $pageCnt;
+		
 		$pdo = pdoSqlConnect();
 		$query =
 		"SELECT
-			topicId,
-			topics
+			topic.topicId,
+			topic.subject,
+			topic.topics,
+			(SELECT count(userId) FROM topicUser WHERE userId = ? AND topicId = topic.topicId AND del = 'N') as isTopic
 		FROM
 			topic
 		WHERE
-			del = 'N'" ;
+			topic.del = 'N'
+		ORDER BY
+			subject, topics
+		LIMIT 
+			$pageNum, $pageCnt" ;
 
 		$st = $pdo->prepare($query);
 		$st->execute([$userId]);
@@ -75,27 +83,4 @@
 
 		$st = null;
 		$pdo = null;
-	}
-	
-	//READ FOLLOW TOPIC USER
-	function readFollowTopic($userId){
-		$pdo = pdoSqlConnect();
-		$query = 
-		"SELECT
-			*
-		FROM
-			topicUser
-		WHERE
-			userId = ? AND del = 'N'" ;
-
-		$st = $pdo->prepare($query);
-		$st->execute([$userId]);
-
-		$st->setFetchMode(PDO::FETCH_ASSOC);
-		$res = $st->fetchAll();
-
-		$st = null;
-		$pdo = null;
-
-		return $res;
 	}

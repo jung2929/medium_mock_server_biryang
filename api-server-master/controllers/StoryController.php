@@ -22,42 +22,15 @@ try {
             header('Content-Type: text/html; charset=UTF-8');
             getLogs("./logs/errors.log");
             break;
-			
 		/*
          * API No. 1
-         * API Name : STORY ALL ADD API
-         * 마지막 수정 날짜 : 19.10.04
-         */
-        case "addAllStory":
-			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
-			
-			if (!isValidHeader($jwt, JWT_SECRET_KEY)) {
-				$res->isSuccess = FALSE;
-				$res->code = 301;
-				$res->message = "유효하지 않은 토큰입니다";
-				echo json_encode($res, JSON_NUMERIC_CHECK);
-				addErrorLogs($errorLogs, $res, $req);
-				return;
-			}		
-			
-			http_response_code(200);
-			
-            addAllStory(isValidHeader($jwt, JWT_SECRET_KEY), $req->title,$req->subTitle, $req->topicId, $req->contents);
-            $res->isSuccess = TRUE;
-            $res->code = 100;
-            $res->message = "스토리 추가 성공";
-            echo json_encode($res, JSON_NUMERIC_CHECK);
-            break;
-			
-		/*
-         * API No. 2
          * API Name : STORY ADD API
          * 마지막 수정 날짜 : 19.10.04
          */
         case "addStory":
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			
-			if (!isValidHeader($jwt, JWT_SECRET_KEY)) {
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
 				$res->isSuccess = FALSE;
 				$res->code = 301;
 				$res->message = "유효하지 않은 토큰입니다";
@@ -75,7 +48,7 @@ try {
 			}
 			
 			http_response_code(200);
-            $res->storyId = addStory(isValidHeader($jwt, JWT_SECRET_KEY), $req->title, $req->subTitle, $req->topicId);
+            $res->storyId = addStory($userId, $req->title, $req->subTitle, $req->topicId);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "스토리 추가 성공";
@@ -84,10 +57,10 @@ try {
 		
 		/*
          * API No. 3
-         * API Name : STORY TEXT ADD API
+         * API Name : STORY CONTENTS ADD API
          * 마지막 수정 날짜 : 19.10.05
          */
-        case "addText":
+        case "addContents":
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			
 			if (!isValidHeader($jwt, JWT_SECRET_KEY)) {
@@ -99,159 +72,27 @@ try {
 				return;
 			}
 			
-			if(empty($req->text)) {
-				$res->isSuccess = FALSE;
-				$res->message = "작성 실패 : <text> 공백입니다.".$res->message;
+			$res->isSuccess = FALSE;
+			if(empty($req->sequence))	$res->message = "<sequence> 공백입니다.".$res->message;
+			if(empty($req->type))		$res->message = "<type> 공백입니다.".$res->message;
+			if(empty($req->contents))	$res->message = "<contents> 공백입니다.".$res->message;
+			
+			if(empty(!$res->message)){
 				$res->code = 201;
+				$res->message = "작성 실패 : ".$res->message;
 				echo json_encode($res, JSON_NUMERIC_CHECK);
 				return;
 			}
 			
 			http_response_code(200);
 			
-            addText($vars["storyId"],$req->text);
+            addContents($vars["storyId"], $req->sequence, $req->type, $req->contents);
             $res->isSuccess = TRUE;
             $res->code = 100;
-            $res->message = "스토리 텍스트 추가 성공";
+            $res->message = "스토리 내용 추가 성공";
             echo json_encode($res, JSON_NUMERIC_CHECK);
             break;
 			
-		/*
-         * API No. 4
-         * API Name : STORY TEXTLIST ADD API
-         * 마지막 수정 날짜 : 19.10.05
-         */
-        case "addTextList":
-			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
-			
-			if (!isValidHeader($jwt, JWT_SECRET_KEY)) {
-				$res->isSuccess = FALSE;
-				$res->code = 301;
-				$res->message = "유효하지 않은 토큰입니다";
-				echo json_encode($res, JSON_NUMERIC_CHECK);
-				addErrorLogs($errorLogs, $res, $req);
-				return;
-			}
-			
-			if(empty($req->textList)) {
-				$res->isSuccess = FALSE;
-				$res->message = "작성 실패 : <textList> 공백입니다.";
-				$res->code = 201;
-				echo json_encode($res, JSON_NUMERIC_CHECK);
-				return;
-			}
-			
-			http_response_code(200);
-			
-            addTextList($vars["storyId"],$req->textList);
-            $res->isSuccess = TRUE;
-            $res->code = 100;
-            $res->message = "스토리 리스트 추가 성공";
-            echo json_encode($res, JSON_NUMERIC_CHECK);
-            break;
-			
-		/*
-         * API No. 5
-         * API Name : STORY IMAGE ADD API
-         * 마지막 수정 날짜 : 19.10.05
-         */
-        case "addImage":
-			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
-			
-			if (!isValidHeader($jwt, JWT_SECRET_KEY)) {
-				$res->isSuccess = FALSE;
-				$res->code = 301;
-				$res->message = "유효하지 않은 토큰입니다";
-				echo json_encode($res, JSON_NUMERIC_CHECK);
-				addErrorLogs($errorLogs, $res, $req);
-				return;
-			}
-			
-			if(empty($req->image)) {
-				$res->isSuccess = FALSE;
-				$res->message = "작성 실패 : <image> 공백입니다.";
-				$res->code = 201;
-				echo json_encode($res, JSON_NUMERIC_CHECK);
-				return;
-			}
-			
-			http_response_code(200);
-			
-            addImage($vars["storyId"],$req->image);
-            $res->isSuccess = TRUE;
-            $res->code = 100;
-            $res->message = "스토리 이미지 추가 성공";
-            echo json_encode($res, JSON_NUMERIC_CHECK);
-            break;
-			
-		/*
-         * API No. 6
-         * API Name : STORY QUOTATION ADD API
-         * 마지막 수정 날짜 : 19.10.05
-         */
-        case "addQuotation":
-			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
-			
-			if (!isValidHeader($jwt, JWT_SECRET_KEY)) {
-				$res->isSuccess = FALSE;
-				$res->code = 301;
-				$res->message = "유효하지 않은 토큰입니다";
-				echo json_encode($res, JSON_NUMERIC_CHECK);
-				addErrorLogs($errorLogs, $res, $req);
-				return;
-			}
-			
-			if(empty($req->quotation)) {
-				$res->isSuccess = FALSE;
-				$res->message = "작성 실패 : <quotation> 공백입니다.";
-				$res->code = 201;
-				echo json_encode($res, JSON_NUMERIC_CHECK);
-				return;
-			}
-			
-			http_response_code(200);
-			
-            addQuotation($vars["storyId"],$req->quotation);
-            $res->isSuccess = TRUE;
-            $res->code = 100;
-            $res->message = "스토리 인용구 추가 성공";
-            echo json_encode($res, JSON_NUMERIC_CHECK);
-            break;
-			
-		/*
-         * API No. 7
-         * API Name : STORY DELIMITER ADD API
-         * 마지막 수정 날짜 : 19.10.05
-         */
-        case "addDelimiter":
-			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
-			
-			if (!isValidHeader($jwt, JWT_SECRET_KEY)) {
-				$res->isSuccess = FALSE;
-				$res->code = 301;
-				$res->message = "유효하지 않은 토큰입니다";
-				echo json_encode($res, JSON_NUMERIC_CHECK);
-				addErrorLogs($errorLogs, $res, $req);
-				return;
-			}
-			
-			
-			if(empty($req->delimiter)) {
-				$res->isSuccess = FALSE;
-				$res->message = "작성 실패 : <delimiter> 공백입니다.";
-				$res->code = 201;
-				echo json_encode($res, JSON_NUMERIC_CHECK);
-				return;
-			}
-			
-			http_response_code(200);
-			
-            addDelimiter($vars["storyId"],$req->delimiter);
-            $res->isSuccess = TRUE;
-            $res->code = 100;
-            $res->message = "스토리 구분자 추가 성공";
-            echo json_encode($res, JSON_NUMERIC_CHECK);
-            break;
 		
 		/*
          * API No. 7
@@ -259,13 +100,28 @@ try {
          * 마지막 수정 날짜 : 19.10.05
          */
         case "readStory":
-	
-			http_response_code(200);
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			
-            $res->storyId = readStory($vars["storyId"]);
+			if (($userId = isValidHeader($jwt, JWT_SECRET_KEY)) != false) {
+				echo $userId;
+				if(!empty(overlapRecentlyList($userId, $vars["storyId"]))){
+					updateRecentlyList($userId, $vars["storyId"]);
+					$res->message = "업데이트";
+				}
+				else {
+					addRecentlyList($userId, $vars["storyId"]);
+					$res->message = "추가";
+				}
+			}
+			else {
+				$res->message = "비회원";
+			}
+			
+			http_response_code(200);
+            $res->result = readStory($vars["storyId"]);
             $res->isSuccess = TRUE;
             $res->code = 100;
-            $res->message = "스토리 조회 성공";
+            $res->message = $res->message . "스토리 조회 성공";
             echo json_encode($res, JSON_NUMERIC_CHECK);
             break;
 					
@@ -275,11 +131,19 @@ try {
          * 마지막 수정 날짜 : 19.10.05
          */
         case "deleteStory":
-			//$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			
-			http_response_code(200);
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
 			
-            deleteStory($vars["storyId"]);
+			http_response_code(200);			
+            deleteStory($userId, $vars["storyId"]);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "스토리 삭제 성공";

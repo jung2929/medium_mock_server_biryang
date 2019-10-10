@@ -117,163 +117,17 @@
 		return $res[0]['storyId'];
 	}
 	
-	//텍스트 추가
-	function addText($storyId, $text){
+	//내용 추가
+	function addContents($storyId, $sequence, $type, $contents){
 		$pdo = pdoSqlConnect();
-		//순서 추가
-		$query = "INSERT INTO sequence (storyId) VALUES (?)";
+		$query = "INSERT INTO contents (storyId, sequence, type, contents) VALUES (?, ?, ?, ?)";
 		
 		$st = $pdo->prepare($query);
-		$st->execute([$storyId]);
-		
-		$pdo = pdoSqlConnect();
-		//순서 확인
-		$query = "SELECT sequenceId FROM sequence WHERE storyId = ? ORDER BY sequenceId DESC LIMIT 1";
-		
-		$st = $pdo->prepare($query);
-		$st->execute([$storyId]);
-		
-		$st->setFetchMode(PDO::FETCH_ASSOC);
-		$res = $st->fetchAll();
-		$sequenceId =$res[0]['sequenceId'];
-		
-		$pdo = pdoSqlConnect();
-		//글 추가
-		$query = "INSERT INTO text (sequenceId, text) VALUES (?, ?)";
-		
-		$st = $pdo->prepare($query);
-		$st->execute([$sequenceId, $text]);
+		$st->execute([$storyId, $sequence, $type, $contents]);
 		
 		$st = null;
 		$pdo = null;
 	}
-	
-	//리스트 추가
-	function addTextList($storyId, $textList){
-		$pdo = pdoSqlConnect();
-		//순서 추가
-		$query = "INSERT INTO sequence (storyId) VALUES (?)";
-		
-		$st = $pdo->prepare($query);
-		$st->execute([$storyId]);
-		
-		$pdo = pdoSqlConnect();
-		//순서 확인
-		$query = "SELECT sequenceId FROM sequence WHERE storyId = ? ORDER BY sequenceId DESC LIMIT 1";
-		
-		$st = $pdo->prepare($query);
-		$st->execute([$storyId]);
-		
-		$st->setFetchMode(PDO::FETCH_ASSOC);
-		$res = $st->fetchAll();
-		$sequenceId =$res[0]['sequenceId'];
-		
-		$pdo = pdoSqlConnect();
-		//글 추가
-		$query = "INSERT INTO textList (sequenceId, textList) VALUES (?, ?)";
-		
-		$st = $pdo->prepare($query);
-		$st->execute([$sequenceId, $textList]);		
-		
-		$st = null;
-		$pdo = null;
-	}
-	
-	//이미지 추가
-	function addImage($storyId, $image){
-		$pdo = pdoSqlConnect();
-		//순서 추가
-		$query = "INSERT INTO sequence (storyId) VALUES (?)";
-		
-		$st = $pdo->prepare($query);
-		$st->execute([$storyId]);
-		
-		$pdo = pdoSqlConnect();
-		//순서 확인
-		$query = "SELECT sequenceId FROM sequence WHERE storyId = ? ORDER BY sequenceId DESC LIMIT 1";
-		
-		$st = $pdo->prepare($query);
-		$st->execute([$storyId]);
-		
-		$st->setFetchMode(PDO::FETCH_ASSOC);
-		$res = $st->fetchAll();
-		$sequenceId =$res[0]['sequenceId'];
-		
-		$pdo = pdoSqlConnect();
-		//글 추가
-		$query = "INSERT INTO image (sequenceId, image) VALUES (?, ?)";
-		
-		$st = $pdo->prepare($query);
-		$st->execute([$sequenceId, $image]);		
-		
-		$st = null;
-		$pdo = null;
-	}
-	
-	//인용구 추가
-	function addQuotation($storyId, $quotation){
-		$pdo = pdoSqlConnect();
-		//순서 추가
-		$query = "INSERT INTO sequence (storyId) VALUES (?)";
-		
-		$st = $pdo->prepare($query);
-		$st->execute([$storyId]);
-		
-		$pdo = pdoSqlConnect();
-		//순서 확인
-		$query = "SELECT sequenceId FROM sequence WHERE storyId = ? ORDER BY sequenceId DESC LIMIT 1";
-		
-		$st = $pdo->prepare($query);
-		$st->execute([$storyId]);
-		
-		$st->setFetchMode(PDO::FETCH_ASSOC);
-		$res = $st->fetchAll();
-		$sequenceId =$res[0]['sequenceId'];
-		
-		$pdo = pdoSqlConnect();
-		//글 추가
-		$query = "INSERT INTO quotation (sequenceId, quotation) VALUES (?, ?)";
-		
-		$st = $pdo->prepare($query);
-		$st->execute([$sequenceId, $quotation]);		
-		
-		$st = null;
-		$pdo = null;
-	}
-	
-	//구분자 추가
-	function addDelimiter($storyId, $delimiter){
-		$pdo = pdoSqlConnect();
-		//순서 추가
-		$query = "INSERT INTO sequence (storyId) VALUES (?)";
-		
-		$st = $pdo->prepare($query);
-		$st->execute([$storyId]);
-		
-		$pdo = pdoSqlConnect();
-		//순서 확인
-		$query = "SELECT sequenceId FROM sequence WHERE storyId = ? ORDER BY sequenceId DESC LIMIT 1";
-		
-		$st = $pdo->prepare($query);
-		$st->execute([$storyId]);
-		
-		$st->setFetchMode(PDO::FETCH_ASSOC);
-		$res = $st->fetchAll();
-		$sequenceId =$res[0]['sequenceId'];
-		
-		$pdo = pdoSqlConnect();
-		//글 추가
-		$query = "INSERT INTO delimiter (sequenceId, delimiter) VALUES (?, ?)";
-		
-		$st = $pdo->prepare($query);
-		$st->execute([$sequenceId, $delimiter]);		
-		
-		$st = null;
-		$pdo = null;
-	}
-	
-	
-	
 	
 	//READ STORY
 	function readStory($storyId){
@@ -287,10 +141,17 @@
 			story.subTitle,
 			story.topicId,
 			topic.topics,
+			publication.publicationId,
+			publication.publications,
+			(SELECT readingList.id FROM readingList WHERE readingList.del = 'N' AND readingList.storyId = story.storyId) as readingListId,
+			(SELECT readingList.type FROM readingList WHERE readingList.del = 'N' AND readingList.storyId = story.storyId) as readingType,
+			(SELECT sum(cnt)FROM storyClap WHERE storyId = story.storyId) as clapCnt,
 			story.createAt
 		FROM
 			story
 			inner join user on story.userId = user.userId
+			left join publicationUser on story.userId = publicationUser.userId
+			left join publication on publicationUser.publicationId = publication.publicationId
 			left join topic on story.topicId = topic.topicId
 		WHERE
 			storyId = ? AND user.del = 'N' AND story.del = 'N'";
@@ -301,116 +162,97 @@
 		$st->setFetchMode(PDO::FETCH_ASSOC);
 		$res = $st->fetchAll();
 		
-		//text 조회
 		$pdo = pdoSqlConnect();
 		$query = 
 		"SELECT
-			text.sequenceId,
-			text.text
+			contents.sequence,
+			contents.type,
+			contents.contents
 		FROM
-			text
-			inner join sequence on text.sequenceId = sequence.sequenceId
+			contents
 		WHERE
-			sequence.storyId = ?
+			contents.storyId = ?
 		ORDER BY
-			text.sequenceId";
+			sequence";
 
 		$st = $pdo->prepare($query);
 		$st->execute([$storyId]);
 		
 		$st->setFetchMode(PDO::FETCH_ASSOC);
-		$res[0]['text'] = $st->fetchAll();
-		
-		//textList 조회
-		$pdo = pdoSqlConnect();
-		$query = 
-		"SELECT
-			textList.sequenceId,
-			textList.textList
-		FROM
-			textList
-			inner join sequence on textList.sequenceId = sequence.sequenceId
-		WHERE
-			sequence.storyId = ?
-		ORDER BY
-			textList.sequenceId";
-
-		$st = $pdo->prepare($query);
-		$st->execute([$storyId]);
-		
-		$st->setFetchMode(PDO::FETCH_ASSOC);
-		$res[0]['textList'] = $st->fetchAll();
-		
-		//image 조회
-		$pdo = pdoSqlConnect();
-		$query = 
-		"SELECT
-			image.sequenceId,
-			image.image
-		FROM
-			image
-			inner join sequence on image.sequenceId = sequence.sequenceId
-		WHERE
-			sequence.storyId = ?
-		ORDER BY
-			image.sequenceId";
-
-		$st = $pdo->prepare($query);
-		$st->execute([$storyId]);
-		
-		$st->setFetchMode(PDO::FETCH_ASSOC);
-		$res[0]['image'] = $st->fetchAll();
-		
-		//quotation 조회
-		$pdo = pdoSqlConnect();
-		$query = 
-		"SELECT
-			quotation.sequenceId,
-			quotation.quotation
-		FROM
-			quotation
-			inner join sequence on quotation.sequenceId = sequence.sequenceId
-		WHERE
-			sequence.storyId = ?
-		ORDER BY
-			quotation.sequenceId";
-
-		$st = $pdo->prepare($query);
-		$st->execute([$storyId]);
-		
-		$st->setFetchMode(PDO::FETCH_ASSOC);
-		$res[0]['quotation'] = $st->fetchAll();
-		
-		//delimiter 조회
-		$pdo = pdoSqlConnect();
-		$query = 
-		"SELECT
-			delimiter.sequenceId,
-			delimiter.delimiter
-		FROM
-			delimiter
-			inner join sequence on delimiter.sequenceId = sequence.sequenceId
-		WHERE
-			sequence.storyId = ?
-		ORDER BY
-			delimiter.sequenceId";
-
-		$st = $pdo->prepare($query);
-		$st->execute([$storyId]);
-		
-		$st->setFetchMode(PDO::FETCH_ASSOC);
-		$res[0]['delimiter'] = $st->fetchAll();
+		$res[0]['contentsList'] = $st->fetchAll();
+	
+		$st = null;
+		$pdo = null;
 		
 		return $res[0];
 	}
 	
-	//DELETE STORY USER
-	function deleteStory($storyId){
+	//중복 확인
+	function overlapRecentlyList($userId, $storyId){
 		$pdo = pdoSqlConnect();
-		$query = "UPDATE story SET del = 'Y' WHERE storyId = ?";
+		$query = 
+		"SELECT
+			recentlyList.id
+		FROM
+			recentlyList
+		WHERE
+			recentlyList.userId = ? AND recentlyList.storyId = ?";
+		
+		$st = $pdo->prepare($query);
+		$st->execute([$userId, $storyId]);
+		
+		$st->setFetchMode(PDO::FETCH_ASSOC);
+		$res = $st->fetchAll();
+		
+		$st = null;
+		$pdo = null;
+		
+		return $res;
+	}
+	
+	//최근 읽은 게시글
+	function addRecentlyList($userId, $storyId){
+		$pdo = pdoSqlConnect();
+		$query =
+		"INSERT INTO
+			recentlyList (userId, storyId)
+		VALUES
+			(?, ?)";
+		
+		$st = $pdo->prepare($query);
+		$st->execute([$userId, $storyId]);
+		
+		$st = null;
+		$pdo = null;
+	}
+
+	//최근 읽은 게시글 업데이트
+	function updateRecentlyList($userId, $storyId){
+		$recentlyAt = date("Y-m-d h:i:s", time());
+		
+		$pdo = pdoSqlConnect();
+		$query =
+		"UPDATE
+			recentlyList
+		SET
+			recentlyList.recentlyAt = ?
+		WHERE
+			recentlyList.userId = ? AND recentlyList.storyId = ?";
+		
+		$st = $pdo->prepare($query);
+		$st->execute([$recentlyAt, $userId, $storyId]);
+		
+		$st = null;
+		$pdo = null;
+	}
+	
+	//DELETE STORY USER
+	function deleteStory($userId, $storyId){
+		$pdo = pdoSqlConnect();
+		$query = "UPDATE story SET del = 'Y' WHERE userId =? AND storyId = ?";
 
 		$st = $pdo->prepare($query);
-		$st->execute([$storyId]);
+		$st->execute([$userId, $storyId]);
 
 		$st = null;
 		$pdo = null;

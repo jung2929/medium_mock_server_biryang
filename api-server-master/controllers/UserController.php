@@ -29,22 +29,14 @@ try {
          * 마지막 수정 날짜 : 19.10.03
          */
         case "addUser":
-			$check_email = preg_match("/^[_\.0-9a-zA-Z-]+@([0-9a-zA-Z][0-9a-zA-Z-]+\.)+[a-zA-Z]{2,6}$/i", $req->email);
+			if(empty($req->type))
+				$res->message = "<type> 공백입니다.".$res->message;
+			if(empty($req->token))
+				$res->message = "<token> 공백입니다.".$res->message;
 			
-			if($check_email==false) {
-				$res->isSuccess = FALSE;
-				$res->message = "<email> 잘못된 이메일 형식입니다.".$res->message;
-				$res->code = 201;
-			}
-			if(empty($req->name)) {
-				$res->isSuccess = FALSE;
-				$res->message = "<name> 공백입니다.".$res->message;
-				$res->code = 201;
-			}
-			
-			if($res->code == 201){		
+			if(!empty($res->message)){		
                 $res->message = "유저 가입 실패 : " . $res->message;
-			
+				$res->code = 201;
 				echo json_encode($res, JSON_NUMERIC_CHECK);
 				addErrorLogs($errorLogs, $res, $req);
 				return;
@@ -61,7 +53,7 @@ try {
 			}
 			
             http_response_code(200);
-            addUser($req->email, $req->name, $req->about, $req->image);
+            addUser($req->type, $req->token);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "유저가입 성공";
@@ -74,20 +66,29 @@ try {
          * 마지막 수정 날짜 : 19.10.03
          */
         case "loginUser":
+			$token = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			
             http_response_code(200);
-			$result = loginUser($req->email);
+			
+			if(empty($token)){
+				$res->code = 201;
+				$res->message = "<tokn> 공백입니다.";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				return;
+			}
+			
+			$result = loginUser($token);
 			
 			if(empty($result)) {
 				$res->isSuccess = FALSE;
-                $res->code = 201;
+                $res->code = 202;
                 $res->message = "유효하지 않습니다.";
-                
                 addErrorLogs($errorLogs, $res, $req);
 				echo json_encode($res, JSON_NUMERIC_CHECK);
-                return;
+                return; 
 			}
 			
-			$jwt = getJWToken($result['userId'], $result['email'], JWT_SECRET_KEY);
+			$jwt = getJWToken($result['userId'], JWT_SECRET_KEY);
 			$res->result->userId =  $result['userId'];
             $res->result->jwt = $jwt;
             $res->isSuccess = TRUE;

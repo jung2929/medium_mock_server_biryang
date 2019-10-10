@@ -26,10 +26,10 @@ function isValidHeader($jwt, $key)
         //return isValidJWToken($data->id, $data->pw, $jwt);
 		
 		$pdo = pdoSqlConnect();
-		$query = "SELECT * FROM user WHERE userId = ? AND email = ? AND del = 'N'";
+		$query = "SELECT userId FROM user WHERE userId = ? AND del = 'N'";
 
 		$st = $pdo->prepare($query);
-		$st->execute([$data->userId, $data->email]);
+		$st->execute([$data->userId]);
 		
 		$st->setFetchMode(PDO::FETCH_ASSOC);
 		$res = $st->fetchAll();
@@ -92,12 +92,11 @@ function getTodayByTimeStamp()
     return date("Y-m-d H:i:s");
 }
 
-function getJWToken($userId, $email, $secretKey)
+function getJWToken($userId, $secretKey)
 {
     $data = array(
         'date' => (string)getTodayByTimeStamp(),
 		'userId' => $userId,
-        'email' => (string)$email,
     );
 
 //    echo json_encode($data);

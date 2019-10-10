@@ -22,15 +22,41 @@ try {
             header('Content-Type: text/html; charset=UTF-8');
             getLogs("./logs/errors.log");
             break;
-        /*
+        
+		/*
          * API No. 0
-         * API Name : USER ADD API
+         * API Name : USER DELETE API
          * 마지막 수정 날짜 : 19.09.21
          */
-        case "showTimeLine":
+        case "recentlyStory":
+			if(empty($req->pageNum))	$res->message = "<pageNum> 공백입니다.".$res->message;
+			if(empty($req->pageCnt))	$res->message = "<pageCnt> 공백입니다.".$res->message;
+			
+			if(empty(!$res->message)){
+				$res->isSuccess = FALSE;
+				$res->code = 201;
+				$res->message = "조회 실패 : ".$res->message;
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				return;
+			}
+			
+            http_response_code(200);
+            $res->result = recentlyStory($req->pageNum, $req->pageCnt);
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "최근 스토리 조회 성공";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;
+		
+		/*
+         * API No. 0
+         * API Name : USER DELETE API
+         * 마지막 수정 날짜 : 19.09.21
+         */
+        case "recentlyList":
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			
-			if (!isValidHeader($jwt, JWT_SECRET_KEY) || isValidHeader($jwt, JWT_SECRET_KEY) != $vars["userId"]) {
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
 				$res->isSuccess = FALSE;
 				$res->code = 301;
 				$res->message = "유효하지 않은 토큰입니다";
@@ -39,39 +65,26 @@ try {
 				return;
 			}
 			
-			http_response_code(200);
-            $res->result = showTimeLine($vars["userId"]);
-            $res->isSuccess = TRUE;
-            $res->code = 100;
-            $res->message = "타임라인 조회 성공";
-            echo json_encode($res, JSON_NUMERIC_CHECK);
-            break;
+			if(empty($req->pageNum))
+				$res->message = "<pageNum> 공백입니다.".$res->message;
+			if(empty($req->pageCnt))
+				$res->message = "<pageCnt> 공백입니다.".$res->message;
 			
-		/*
-         * API No. 0
-         * API Name : USER DELETE API
-         * 마지막 수정 날짜 : 19.09.21
-         */
-        case "showComment":
-			if(empty(checkPost($vars["userId"],$vars["postId"]))) {
+			if(empty(!$res->message)){
 				$res->isSuccess = FALSE;
-                $res->code = 201;
-                $res->message = $res->message . "게시글 없음";
-			
+				$res->code = 201;
+				$res->message = "조회 실패 : ".$res->message;
 				echo json_encode($res, JSON_NUMERIC_CHECK);
-				addErrorLogs($errorLogs, $res, $req);
 				return;
 			}
 			
             http_response_code(200);
-            $res->result = showComment($vars["postId"]);
+            $res->result = recentlyList($userId, $req->pageNum, $req->pageCnt);
             $res->isSuccess = TRUE;
             $res->code = 100;
-            $res->message = "게시글 코멘트 조회 성공";
+            $res->message = "최근 스토리 조회 성공";
             echo json_encode($res, JSON_NUMERIC_CHECK);
             break;
-		
-				
     }
 } catch (\Exception $e) {
     return getSQLErrorException($errorLogs, $e, $req);

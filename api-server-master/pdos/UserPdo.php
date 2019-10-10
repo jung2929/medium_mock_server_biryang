@@ -1,15 +1,15 @@
 <?php
 	//CREATE USER
-	function addUser($email, $name, $about, $image){
+	function addUser($type, $token){
 		$pdo = pdoSqlConnect();
 		$query =
 		"INSERT INTO
-			user(email, name, about, image)
+			user(type, token)
 		VALUES
-			(?, ?, ?, ?)";
+			(?, ?)";
 
 		$st = $pdo->prepare($query);
-		$st->execute([$email, $name, $about, $image]);
+		$st->execute([$type, $token]);
 
 		$st = null;
 		$pdo = null;
@@ -39,18 +39,18 @@
 	}
 	
 	//LOGIN USER
-	function loginUser($email){
+	function loginUser($userId){
 		$pdo = pdoSqlConnect();
 		$query =
 		"SELECT
-			*
+			userId
 		FROM
 			user
 		WHERE
-			email = ? AND del = 'N'";
+			userId = ? AND del = 'N'";
 
 		$st = $pdo->prepare($query);
-		$st->execute([$email]);
+		$st->execute([$userId]);
 		
 		$st->setFetchMode(PDO::FETCH_ASSOC);
 		$res = $st->fetchAll();
@@ -64,7 +64,7 @@
 	//READ USER
 	function userList($pageNum, $pageCnt)
 	{
-		$pageNum = $pageNum *  $pageCnt;
+		$pageNum = ($pageNum - 1) * $pageCnt;
 		
 		$pdo = pdoSqlConnect();
 		$query =
@@ -159,7 +159,7 @@
 		$pdo = null;
 	}
 	
-	//delete FOLLOW USER
+	//DELETE FOLLOW USER
 	function deleteFollowUser($followerId, $followingId){
 		$pdo = pdoSqlConnect();
 		$query = "UPDATE followUser SET del = 'Y' WHERE followerId = ? AND followingId = ?;";
@@ -314,7 +314,32 @@
 	}
 	
 	
-	
+	//READ BLOCK USER
+	function blockUserList($userId){
+		$pdo = pdoSqlConnect();
+		$query = 
+		"SELECT
+			user.userId,
+			user.name,
+			user.image
+		FROM
+			blockUser
+			inner join user on blockUser.blockId = user.userId
+		WHERE
+			blockUser.blockId = ? AND blockUser.del = 'N' AND user.del = 'N'" ;
+
+		$st = $pdo->prepare($query);
+		$st->execute([$userId]);
+
+		$st->setFetchMode(PDO::FETCH_ASSOC);
+		$res = $st->fetchAll();
+
+		$st = null;
+		$pdo = null;
+
+		return $res;
+	}
+
 	//DELETE USER
 	function deleteUser($userId){
 		$pdo = pdoSqlConnect();

@@ -28,16 +28,104 @@ try {
          * 마지막 수정 날짜 : 19.10.07
          */
         case "addReadingList":
-						
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
+		
+			if(!empty(overlapReadingList($userId, $req->storyId))){
+				$res->isSuccess = TRUE;
+				$res->code = 100;
+				$res->message = "스토리 중복";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				return;
+			}
+				
 			http_response_code(200);
-            addReadingList($req->userId, $req->storyId);
+            addReadingList($userId, $req->storyId);
             $res->isSuccess = TRUE;
             $res->code = 100;
-            $res->message = "게시글 저장";
+            $res->message = "스토리 저장";
             echo json_encode($res, JSON_NUMERIC_CHECK);
             break;
 			
+		case "archiveReadingList":	
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+ 
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
+			
+			http_response_code(200);
+            updataRedingList($userId, $vars["readingListId"]);
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "스토리 보관";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;
+
+		case "deleteReadingList":	
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+	
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
+			
+			http_response_code(200);
+            deleteReadingList($userId, $vars["readingListId"]);
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "리스트 목록 삭제";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;			
 		
+		case "readReadingList":	
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+	
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
+			
+			if(empty($req->pageNum))
+				$res->message = "<pageNum> 공백입니다.".$res->message;
+			if(empty($req->pageCnt))
+				$res->message = "<pageCnt> 공백입니다.".$res->message;
+			
+			if(!empty($res->message)){
+				$res->code = 201;
+				$res->message = "조회 실패 : ".$res->message;
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				return;
+			}
+			
+			http_response_code(200);
+            $res->result = readReadingList($userId, $req->type, $req->pageNum, $req->pageCnt);
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "스토리 조회";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;		
     }
 } catch (\Exception $e) {
     return getSQLErrorException($errorLogs, $e, $req);

@@ -44,7 +44,7 @@ try {
          */
         case "deleteTopic":
             http_response_code(200);
-            deleteTopic($req->topicId, $vars["userId"]);
+            deleteTopic($req->topicId);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "토픽 삭제 성공";
@@ -57,11 +57,22 @@ try {
          * 마지막 수정 날짜 : 19.10.06
          */
         case "readTopic":
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;				
+			}
+			
 			http_response_code(200);
-            $res->result = readTopic();
+            $res->result = readTopic($userId, $req->pageNum, $req->pageCnt);
             $res->isSuccess = TRUE;
             $res->code = 100;
-            $res->message = "토픽 추가 성공";
+            $res->message = "토픽 조회 성공";
             echo json_encode($res, JSON_NUMERIC_CHECK);
             break;
 		
@@ -72,8 +83,19 @@ try {
          * 마지막 수정 날짜 : 19.10.06
          */
         case "followTopic":
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
+			
             http_response_code(200);
-            followTopic($req->topicId, $vars["userId"]);
+            followTopic($vars["topicId"], $userId);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "팔로우 추가 성공";
@@ -86,25 +108,22 @@ try {
          * 마지막 수정 날짜 : 19.10.06
          */
         case "deleteFollowTopic":
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
+			
             http_response_code(200);
-            deleteFollowTopic($req->topicId, $vars["userId"]);
+            deleteFollowTopic($vars["topicId"], $userId);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "팔로우 삭제 성공";
-            echo json_encode($res, JSON_NUMERIC_CHECK);
-            break;
-		
-		/*
-         * API No. 6
-         * API Name : TOPIC FOLLOW READ API
-         * 마지막 수정 날짜 : 19.10.06
-         */
-        case "readFollowTopic":
-            http_response_code(200);
-            $res->result = readFollowTopic($vars["userId"]);
-            $res->isSuccess = TRUE;
-            $res->code = 100;
-            $res->message = "조회 성공";
             echo json_encode($res, JSON_NUMERIC_CHECK);
             break;
     }
