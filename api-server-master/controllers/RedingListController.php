@@ -97,7 +97,10 @@ try {
 		
 		case "readReadingList":	
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
-	
+			$pageNum = $_GET['pageNum'];
+			$pageCnt = $_GET['pageCnt'];
+			$type = $_GET['type'];			
+
 			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
 				$res->isSuccess = FALSE;
 				$res->code = 301;
@@ -106,11 +109,12 @@ try {
 				addErrorLogs($errorLogs, $res, $req);
 				return;
 			}
-			
-			if(empty($req->pageNum))
+			if(empty($pageNum))
 				$res->message = "<pageNum> 공백입니다.".$res->message;
-			if(empty($req->pageCnt))
+			if(empty($pageCnt))
 				$res->message = "<pageCnt> 공백입니다.".$res->message;
+			if(empty($type))
+				$res->message = "<type> 공백입니다.".$res->message;
 			
 			if(!empty($res->message)){
 				$res->code = 201;
@@ -120,7 +124,7 @@ try {
 			}
 			
 			http_response_code(200);
-            $res->result = readReadingList($userId, $req->type, $req->pageNum, $req->pageCnt);
+            $res->result = readReadingList($userId, $type, $pageNum, $pageCnt);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "스토리 조회";

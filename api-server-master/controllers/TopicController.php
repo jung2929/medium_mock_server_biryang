@@ -58,7 +58,10 @@ try {
          */
         case "readTopic":
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
-			
+			$pageNum = $_GET['pageNum'];
+			$pageCnt = $_GET['pageCnt'];
+						
+
 			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
 				$res->isSuccess = FALSE;
 				$res->code = 301;
@@ -67,9 +70,20 @@ try {
 				addErrorLogs($errorLogs, $res, $req);
 				return;				
 			}
+			if(empty($pageNum))
+				$res->message = "<pageNum> 공백입니다.".$res->message;
+			if(empty($pageCnt))
+				$res->message = "<pageCnt> 공백입니다.".$res->message;
+			if(empty(!$res->message)){
+				$res->isSuccess = FALSE;
+				$res->code = 201;
+				$res->message = "조회 실패 : ".$res->message;
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				return;
+			}
 			
 			http_response_code(200);
-            $res->result = readTopic($userId, $req->pageNum, $req->pageCnt);
+            $res->result = readTopic($userId, $pageNum, $pageCnt);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "토픽 조회 성공";

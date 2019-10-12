@@ -29,8 +29,13 @@ try {
          * 마지막 수정 날짜 : 19.09.21
          */
         case "recentlyStory":
-			if(empty($req->pageNum))	$res->message = "<pageNum> 공백입니다.".$res->message;
-			if(empty($req->pageCnt))	$res->message = "<pageCnt> 공백입니다.".$res->message;
+			$pageNum = $_GET['pageNum'];
+			$pageCnt = $_GET['pageCnt'];
+						
+			if(empty($pageNum))
+				$res->message = "<pageNum> 공백입니다.".$res->message;
+			if(empty($pageCnt))
+				$res->message = "<pageCnt> 공백입니다.".$res->message;
 			
 			if(empty(!$res->message)){
 				$res->isSuccess = FALSE;
@@ -41,7 +46,7 @@ try {
 			}
 			
             http_response_code(200);
-            $res->result = recentlyStory($req->pageNum, $req->pageCnt);
+            $res->result = recentlyStory($pageNum, $pageCnt);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "최근 스토리 조회 성공";
@@ -55,6 +60,8 @@ try {
          */
         case "recentlyList":
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			$pageNum = $_GET['pageNum'];
+			$pageCnt = $_GET['pageCnt'];
 			
 			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
 				$res->isSuccess = FALSE;
@@ -64,10 +71,10 @@ try {
 				addErrorLogs($errorLogs, $res, $req);
 				return;
 			}
-			
-			if(empty($req->pageNum))
+					
+			if(empty($pageNum))
 				$res->message = "<pageNum> 공백입니다.".$res->message;
-			if(empty($req->pageCnt))
+			if(empty($pageCnt))
 				$res->message = "<pageCnt> 공백입니다.".$res->message;
 			
 			if(empty(!$res->message)){
@@ -79,7 +86,7 @@ try {
 			}
 			
             http_response_code(200);
-            $res->result = recentlyList($userId, $req->pageNum, $req->pageCnt);
+            $res->result = recentlyList($userId, $pageNum, $pageCnt);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "최근 스토리 조회 성공";

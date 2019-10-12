@@ -81,7 +81,7 @@
 	function readReadingList($userId, $type, $pageNum, $pageCnt){
 		$pageNum = ($pageNum - 1) * $pageCnt;
 		$cnt = 0;
-		
+
 		$pdo = pdoSqlConnect();
 		$query = 
 		"SELECT

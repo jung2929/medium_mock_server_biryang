@@ -67,12 +67,11 @@ try {
          */
         case "loginUser":
 			$token = $_SERVER["HTTP_X_ACCESS_TOKEN"];
-			
             http_response_code(200);
 			
 			if(empty($token)){
 				$res->code = 201;
-				$res->message = "<tokn> 공백입니다.";
+				$res->message = "<token> 공백입니다.";
 				echo json_encode($res, JSON_NUMERIC_CHECK);
 				return;
 			}
