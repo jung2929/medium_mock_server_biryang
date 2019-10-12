@@ -4,11 +4,11 @@
 		$pdo = pdoSqlConnect();
 		$query =
 		"SELECT
-			clap.cnt
+			storyClap.cnt
 		FROM
-			clap
+			storyClap
 		WHERE
-			userId = ? AND storyId = ?";
+			storyClap.userId = ? AND storyClap.storyId = ?";
 
 		$st = $pdo->prepare($query);
 		$st->execute([$userId, $storyId]);
@@ -20,7 +20,7 @@
 		if(empty($res)) {
 			$query =
 			"INSERT INTO
-				clap(userId, storyId)
+				storyClap(userId, storyId)
 			VALUES
 				(?, ?)";
 				
@@ -32,7 +32,7 @@
 		else if($res[0]['cnt'] < 50){
 			$query =
 			"UPDATE
-				clap
+				storyClap
 			SET
 				cnt = cnt + 1
 			WHERE

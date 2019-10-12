@@ -28,14 +28,22 @@ try {
          * 마지막 수정 날짜 : 19.09.21
          */
         case "addComment":
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			
-			
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
 			
             http_response_code(200);
-            addComment($req->userId, $req->sequenceId, $req->comment);
+            addComment($req->contentsId, $userId, $req->contents, $req->comment);
             $res->isSuccess = TRUE;
             $res->code = 100;
-            $res->message = "댓글 작성 성공";
+            $res->message = "코멘트 작성 성공";
             echo json_encode($res, JSON_NUMERIC_CHECK);
             break;
 		
@@ -45,16 +53,16 @@ try {
          * 마지막 수정 날짜 : 19.09.21
          */
         case "deleteComment":
-			/*$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			
-			if (!isValidHeader($jwt, JWT_SECRET_KEY) || isValidHeader($jwt, JWT_SECRET_KEY) != $vars["userId"]) {
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
 				$res->isSuccess = FALSE;
 				$res->code = 301;
 				$res->message = "유효하지 않은 토큰입니다";
 				echo json_encode($res, JSON_NUMERIC_CHECK);
 				addErrorLogs($errorLogs, $res, $req);
 				return;
-			}*/
+			}
 			
             http_response_code(200);
             deleteComment($vars["commentId"]);
@@ -70,16 +78,16 @@ try {
          * 마지막 수정 날짜 : 19.09.21
          */
         case "updataComment":
-			/*$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			
-			if (!isValidHeader($jwt, JWT_SECRET_KEY) || isValidHeader($jwt, JWT_SECRET_KEY) != $vars["userId"]) {
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
 				$res->isSuccess = FALSE;
 				$res->code = 301;
 				$res->message = "유효하지 않은 토큰입니다";
 				echo json_encode($res, JSON_NUMERIC_CHECK);
 				addErrorLogs($errorLogs, $res, $req);
 				return;
-			}*/
+			}
 		
             http_response_code(200);
             updataComment($vars["commentId"], $req->comment);
@@ -122,7 +130,7 @@ try {
 			}*/
 		
             http_response_code(200);
-            $res->result = readStoryComment($req->storyId);
+            $res->result = readStoryComment($vars["storyId"]);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "코멘트 읽기 성공";

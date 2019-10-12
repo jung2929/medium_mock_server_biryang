@@ -52,7 +52,7 @@
 		
 		$r->addRoute('GET'		, '/story'									, ['ShowController', 'recentlyStory']);
 		$r->addRoute('GET'		, '/recentlylist'							, ['ShowController', 'recentlyList']);
-		$r->addRoute('GET'		, '/story/{storyId}/clap'					, ['ClapController', 'addClap']);
+		$r->addRoute('POST'		, '/story/{storyId}/clap'					, ['ClapController', 'addClap']);
 			
 		$r->addRoute('POST'		, '/topic'									, ['TopicController', 'addTopic']);
 		$r->addRoute('DELETE'	, '/topic'									, ['TopicController', 'deleteTopic']);
@@ -63,7 +63,7 @@
 		$r->addRoute('POST'		, '/comment'								, ['CommentController', 'addComment']);
 		$r->addRoute('DELETE'	, '/comment/{commentId}'					, ['CommentController', 'deleteComment']);
 		$r->addRoute('PATCH'	, '/comment/{commentId}'					, ['CommentController', 'updataComment']);
-		$r->addRoute('GET'		, '/comment'								, ['CommentController', 'readStoryComment']);
+		$r->addRoute('GET'		, '/story/{storyId}/comment'				, ['CommentController', 'readStoryComment']);
 		$r->addRoute('GET'		, '/comment/{commentId}'					, ['CommentController', 'readComment']);
 	
 	

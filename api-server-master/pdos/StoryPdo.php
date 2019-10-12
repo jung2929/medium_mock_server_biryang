@@ -165,6 +165,7 @@
 		$pdo = pdoSqlConnect();
 		$query = 
 		"SELECT
+			contents.contentsId,
 			contents.sequence,
 			contents.type,
 			contents.contents

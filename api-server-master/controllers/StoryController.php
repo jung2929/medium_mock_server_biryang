@@ -22,12 +22,51 @@ try {
             header('Content-Type: text/html; charset=UTF-8');
             getLogs("./logs/errors.log");
             break;
+			
 		/*
          * API No. 1
          * API Name : STORY ADD API
          * 마지막 수정 날짜 : 19.10.04
          */
         case "addStory":
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
+			
+			if(empty($req->title)) {
+				$res->isSuccess = FALSE;
+				$res->message = "작성 실패 : <title> 공백입니다.".$res->message;
+				$res->code = 201;
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				return;
+			}
+			
+			http_response_code(200);
+            $storyId = addStory($userId, $req->title, $req->subTitle, $req->topicId);
+			$sequence = 1;
+			foreach($req->contents as $val){
+				addContents($storyId, $sequence, $req->contents[$sequence-1]->types, $req->contents[$sequence-1]->contents);
+				$sequence++;
+			}		   
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "스토리 추가 성공";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;			
+			
+		/*
+         * API No. 1
+         * API Name : STORY ADD API
+         * 마지막 수정 날짜 : 19.10.04
+         */
+        case "addAllStory":
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			
 			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {

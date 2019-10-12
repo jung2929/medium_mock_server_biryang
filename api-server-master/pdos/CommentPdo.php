@@ -1,13 +1,13 @@
 <?php
 	//CREATE USER
-	function addComment($sequenceId, $userId, $comment){
+	function addComment($sequenceId, $userId, $contents, $comment){
 		if(empty($group)) $group = 0;
 		
 		$pdo = pdoSqlConnect();
-		$query = "INSERT INTO comment ( sequenceId, userId, comment) VALUES (?, ?, ?)";
+		$query = "INSERT INTO comment (contentsId, userId, contents, comment) VALUES (?, ?, ?, ?)";
 		
 		$st = $pdo->prepare($query);
-		$st->execute([$sequenceId, $userId, $comment]);
+		$st->execute([$sequenceId, $userId, $contents, $comment]);
 
 		$st = null;
 		$pdo = null;
@@ -46,16 +46,15 @@
 		$query = 
 		"SELECT
 			comment.commentId,
-			sequence.storyId,
-			comment.sequenceId,
+			comment.contentsId,
 			user.userId,
 			user.name,
+			comment.contents,
 			comment.comment,
 			comment.createAt
 		FROM
 			comment
 			inner join user on comment.userId = user.userid
-			inner join sequence on comment.sequenceId = sequence .sequenceId
 		WHERE
 			comment.commentId = ? AND comment.del = 'N'";
 
@@ -76,18 +75,18 @@
 		$query = 
 		"SELECT
 			comment.commentId,
-			sequence.storyId,
-			comment.sequenceId,
+			comment.contentsId,
 			user.userId,
 			user.name,
+			comment.contents,
 			comment.comment,
 			comment.createAt
 		FROM
 			comment
 			inner join user on comment.userId = user.userid
-			inner join sequence on comment.sequenceId = sequence .sequenceId
+			inner join contents on comment.contentsId = contents .contentsId
 		WHERE
-			sequence.storyId = ? AND comment.del = 'N'";
+			contents.storyId = ? AND comment.del = 'N'";
 
 		$st = $pdo->prepare($query);
 		$st->execute([$storyId]);
