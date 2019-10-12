@@ -130,7 +130,7 @@
 	}
 	
 	//READ STORY
-	function readStory($storyId){
+	function readStory($userId, $storyId){
 		$pdo = pdoSqlConnect();
 		$query = 
 		"SELECT
@@ -143,8 +143,8 @@
 			topic.topics,
 			publication.publicationId,
 			publication.publications,
-			(SELECT readingList.id FROM readingList WHERE readingList.del = 'N' AND readingList.storyId = story.storyId) as readingListId,
-			(SELECT readingList.type FROM readingList WHERE readingList.del = 'N' AND readingList.storyId = story.storyId) as readingType,
+			(SELECT readingList.id FROM readingList WHERE readingList.del = 'N' AND readingList.storyId = story.storyId AND readingList.userId = ?) as readingListId,
+			(SELECT readingList.type FROM readingList WHERE readingList.del = 'N' AND readingList.storyId = story.storyId AND readingList.userId = ?) as readingType,
 			(SELECT sum(cnt)FROM storyClap WHERE storyId = story.storyId) as clapCnt,
 			story.createAt
 		FROM
@@ -157,7 +157,7 @@
 			storyId = ? AND user.del = 'N' AND story.del = 'N'";
 
 		$st = $pdo->prepare($query);
-		$st->execute([$storyId]);
+		$st->execute([$userId, $userId, $storyId]);
 		
 		$st->setFetchMode(PDO::FETCH_ASSOC);
 		$res = $st->fetchAll();

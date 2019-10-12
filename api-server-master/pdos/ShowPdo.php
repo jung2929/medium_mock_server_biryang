@@ -57,7 +57,7 @@
 	
 	
 	//READ STORY
-	function recentlyStory($pageNum, $pageCnt){
+	function recentlyStory($userId, $pageNum, $pageCnt){
 		$pageNum = ($pageNum - 1) * $pageCnt;
 		$cnt = 0;
 		
@@ -73,8 +73,8 @@
 			topic.topics,
 			publication.publicationId,
 			publication.publications,
-			(SELECT readingList.id FROM readingList WHERE readingList.del = 'N' AND readingList.storyId = story.storyId) as readingListId,
-			(SELECT readingList.type FROM readingList WHERE readingList.del = 'N' AND readingList.storyId = story.storyId) as readingType,
+			(SELECT readingList.id FROM readingList WHERE readingList.del = 'N' AND readingList.storyId = story.storyId AND readingList.userId = ?) as readingListId,
+			(SELECT readingList.type FROM readingList WHERE readingList.del = 'N' AND readingList.storyId = story.storyId AND readingList.userId = ?) as readingType,
 			story.createAt
 		FROM
 			story
@@ -88,7 +88,7 @@
 			$pageNum, $pageCnt";
 
 		$st = $pdo->prepare($query);
-		$st->execute([]);
+		$st->execute([$userId, $userId]);
 		
 		$st->setFetchMode(PDO::FETCH_ASSOC);
 		$res = $st->fetchAll();
@@ -159,8 +159,8 @@
 			topic.topics,
 			publication.publicationId,
 			publication.publications,
-			(SELECT readingList.id FROM readingList WHERE readingList.del = 'N' AND readingList.storyId = story.storyId) as readingListId,
-			(SELECT readingList.type FROM readingList WHERE readingList.del = 'N' AND readingList.storyId = story.storyId) as readingType,
+			(SELECT readingList.id FROM readingList WHERE readingList.del = 'N' AND readingList.storyId = story.storyId AND readingList.userId = ?) as readingListId,
+			(SELECT readingList.type FROM readingList WHERE readingList.del = 'N' AND readingList.storyId = story.storyId AND readingList.userId = ?) as readingType,
 			story.createAt
 		FROM
 			recentlyList
@@ -177,7 +177,7 @@
 			$pageNum, $pageCnt";
 
 		$st = $pdo->prepare($query);
-		$st->execute([$userId]);
+		$st->execute([$userId, $userId, $userId]);
 		
 		$st->setFetchMode(PDO::FETCH_ASSOC);
 		$res = $st->fetchAll();
