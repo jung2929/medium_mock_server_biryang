@@ -38,8 +38,9 @@ try {
 				addErrorLogs($errorLogs, $res, $req);
 				return;
 			}
-		
+
 			if(!empty(overlapReadingList($userId, $req->storyId))){
+				$res->readingListId = selectRedingList($userId, $req->storyId);
 				$res->isSuccess = TRUE;
 				$res->code = 100;
 				$res->message = "스토리 중복";
@@ -49,6 +50,7 @@ try {
 				
 			http_response_code(200);
             addReadingList($userId, $req->storyId);
+			$res->readingListId = selectRedingList($userId, $req->storyId);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "스토리 저장";

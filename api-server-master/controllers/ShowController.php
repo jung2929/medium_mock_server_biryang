@@ -29,6 +29,8 @@ try {
          * 마지막 수정 날짜 : 19.09.21
          */
         case "recentlyStory":
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+
 			$pageNum = $_GET['pageNum'];
 			$pageCnt = $_GET['pageCnt'];
 						
@@ -45,8 +47,12 @@ try {
 				return;
 			}
 			
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$userId = 0;
+			}
+			
             http_response_code(200);
-            $res->result = recentlyStory($pageNum, $pageCnt);
+            $res->result = recentlyStory($userId,$pageNum, $pageCnt);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "최근 스토리 조회 성공";

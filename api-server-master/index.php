@@ -31,12 +31,12 @@
 		$r->addRoute('GET', '/jwt', ['MainController', 'validateJwt']);
 		$r->addRoute('POST', '/jwt', ['MainController', 'createJwt']);
 		
-		$r->addRoute('GET'		, '/user'									, ['UserController', 'userList']);
+		$r->addRoute('GET'		, '/user/info'								, ['UserController', 'userList']);
 		$r->addRoute('POST'		, '/login'									, ['UserController', 'loginUser']);
 		$r->addRoute('POST'		, '/user'									, ['UserController', 'addUser']);
-		$r->addRoute('GET'		, '/user/{userId}'							, ['UserController', 'detailUser']);
-		$r->addRoute('DELETE'	, '/user/{userId}'							, ['UserController', 'deleteUser']);
-		$r->addRoute('PATCH'	, '/user/{userId}'							, ['UserController', 'updataUser']);
+		$r->addRoute('GET'		, '/user'									, ['UserController', 'detailUser']);
+		$r->addRoute('DELETE'	, '/user'									, ['UserController', 'deleteUser']);
+		$r->addRoute('PATCH'	, '/user'									, ['UserController', 'updataUser']);
 		$r->addRoute('POST'		, '/user/{userId}/following'				, ['UserController', 'followUser']);
 		$r->addRoute('DELETE'	, '/user/{userId}/following'				, ['UserController', 'deleteFollowUser']);
 		$r->addRoute('GET'		, '/user/{userId}/follower'					, ['UserController', 'followerUser']);

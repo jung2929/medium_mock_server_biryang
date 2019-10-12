@@ -22,7 +22,7 @@
 		return $res[0];
 	}
 	
-	//CREATE USER
+	//CREATE
 	function addReadingList($userId, $storyId){
 		$pdo = pdoSqlConnect();
 		$query =
@@ -36,6 +36,29 @@
 
 		$st = null;
 		$pdo = null;
+	}
+	
+	//SELECT
+	function selectRedingList($userId, $storyId){
+		$pdo = pdoSqlConnect();
+		$query =
+		"SELECT
+			id
+		FROM
+			readingList
+		WHERE
+			userId = ? AND storyId = ? AND del = 'N'";
+		
+		$st = $pdo->prepare($query);
+		$st->execute([$userId, $storyId]);
+
+		$st->setFetchMode(PDO::FETCH_ASSOC);
+		$res = $st->fetchAll();
+		
+		$st = null;
+		$pdo = null;
+		
+		return $res[0]['id'];
 	}
 	
 	//UPDATE

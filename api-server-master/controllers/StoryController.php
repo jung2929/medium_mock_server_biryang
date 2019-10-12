@@ -157,7 +157,7 @@ try {
 			}
 			
 			http_response_code(200);
-            $res->result = readStory($vars["storyId"]);
+            $res->result = readStory($userId, $vars["storyId"]);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = $res->message . "스토리 조회 성공";

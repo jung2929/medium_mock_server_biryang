@@ -140,7 +140,7 @@ try {
 		case "detailUser":
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			
-			if (!isValidHeader($jwt, JWT_SECRET_KEY) || isValidHeader($jwt, JWT_SECRET_KEY) != $vars["userId"]) {
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
 				$res->isSuccess = FALSE;
 				$res->code = 301;
 				$res->message = "유효하지 않은 토큰입니다";
@@ -150,7 +150,7 @@ try {
 			}
 			
             http_response_code(200);
-            $res->result = detailUser((int)$vars["userId"]);
+            $res->result = detailUser((int)$userId);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "유저 조회 성공";
@@ -165,7 +165,7 @@ try {
 		case "updataUser":
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			
-			if (!isValidHeader($jwt, JWT_SECRET_KEY) || isValidHeader($jwt, JWT_SECRET_KEY) != $vars["userId"]) {
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
 				$res->isSuccess = FALSE;
 				$res->code = 301;
 				$res->message = "유효하지 않은 토큰입니다";
@@ -175,7 +175,7 @@ try {
 			}
 			
 			http_response_code(200);
-            updataUser($vars["userId"], $req->name, $req->about, $req->image);
+            updataUser($userId, $req->name, $req->about, $req->image);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "유저 정보 수정 성공";
@@ -190,7 +190,7 @@ try {
         case "followUser":
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			
-			if (!isValidHeader($jwt, JWT_SECRET_KEY) || isValidHeader($jwt, JWT_SECRET_KEY) != $vars["userId"]) {
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
 				$res->isSuccess = FALSE;
 				$res->code = 301;
 				$res->message = "유효하지 않은 토큰입니다";
@@ -225,7 +225,7 @@ try {
         case "deleteFollowUser":
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			
-			if (!isValidHeader($jwt, JWT_SECRET_KEY) || isValidHeader($jwt, JWT_SECRET_KEY) != $vars["userId"]) {
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
 				$res->isSuccess = FALSE;
 				$res->code = 301;
 				$res->message = "유효하지 않은 토큰입니다";
@@ -248,6 +248,17 @@ try {
          * 마지막 수정 날짜 : 19.09.20
          */			
 		case "followingUser":
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
+			
             http_response_code(200);
             $res->result = followingUser($vars["userId"]);
             $res->isSuccess = TRUE;
@@ -262,6 +273,17 @@ try {
          * 마지막 수정 날짜 : 19.09.20
          */			
 		case "followerUser":
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$res->isSuccess = FALSE;
+				$res->code = 301;
+				$res->message = "유효하지 않은 토큰입니다";
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
+			
             http_response_code(200);
             $res->result = followerUser($vars["userId"]);
             $res->isSuccess = TRUE;
