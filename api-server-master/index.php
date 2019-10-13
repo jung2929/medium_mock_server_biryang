@@ -33,7 +33,8 @@
 		//$r->addRoute('POST', '/test', ['IndexController', 'testPost']);
 		$r->addRoute('GET', '/jwt', ['MainController', 'validateJwt']);
 		$r->addRoute('POST', '/jwt', ['MainController', 'createJwt']);
-		
+		$r->addRoute('GET'		, '/user/story'								, ['ShowController', 'userStory']);
+		$r->addRoute('GET'		, '/user/{userId}/story'					, ['ShowController', 'userStory']);		
 		$r->addRoute('GET'		, '/search'									, ['SearchController', 'searchType']);
 		$r->addRoute('GET'		, '/story/search'							, ['SearchController', 'searchStory']);
 		$r->addRoute('GET'		, '/topic/search'							, ['SearchController', 'searchTopic']);
@@ -46,6 +47,7 @@
 		$r->addRoute('DELETE'	, '/user'									, ['UserController', 'deleteUser']);
 		$r->addRoute('PATCH'	, '/user'									, ['UserController', 'updataUser']);
 		$r->addRoute('GET'		, '/user/{userId}'							, ['UserController', 'detailUser']);
+
 		
 		$r->addRoute('POST'		, '/following/{followUserId}'				, ['UserController', 'followUser']);
 		$r->addRoute('DELETE'	, '/following/{followUserId}'				, ['UserController', 'deleteFollowUser']);
@@ -64,6 +66,8 @@
 		$r->addRoute('GET'		, '/story'									, ['ShowController', 'recentlyStory']);
 		$r->addRoute('GET'		, '/recentlylist'							, ['ShowController', 'recentlyList']);
 		$r->addRoute('GET'		, '/popularlist'							, ['ShowController', 'popularStory']);
+
+		
 		$r->addRoute('POST'		, '/story/{storyId}/clap'					, ['ClapController', 'addClap']);
 			
 		$r->addRoute('POST'		, '/topic'									, ['TopicController', 'addTopic']);

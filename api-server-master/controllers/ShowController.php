@@ -101,18 +101,47 @@ try {
 		
 		case "popularStory":
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
-	
+			$pageNum = $_GET['pageNum'];
+			$pageCnt = $_GET['pageCnt'];
+			
+			if(empty($pageNum))
+				$pageNum = 1;
+			if(empty($pageCnt))
+				$pageCnt = 5;
+			
 			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
 				$userId = 0;
 			}		
 			
             http_response_code(200);
-            $res->result = popularStory($userId);
+            $res->result = popularStory($userId, $pageNum, $pageCnt);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "인기 스토리 조회 성공";
             echo json_encode($res, JSON_NUMERIC_CHECK);
             break;
+			
+		case "userStory":
+			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
+			$pageNum = $_GET['pageNum'];
+			$pageCnt = $_GET['pageCnt'];
+			
+			if(empty($pageNum))
+				$pageNum = 1;
+			if(empty($pageCnt))
+				$pageCnt = 5;
+			
+			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
+				$userId = 0;
+			}
+			
+            http_response_code(200);
+            $res->result = userStory($userId, $vars['userId'], $pageNum, $pageCnt);
+            $res->isSuccess = TRUE;
+            $res->code = 100;
+            $res->message = "스토리 조회 성공";
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+            break;	
     }
 } catch (\Exception $e) {
     return getSQLErrorException($errorLogs, $e, $req);

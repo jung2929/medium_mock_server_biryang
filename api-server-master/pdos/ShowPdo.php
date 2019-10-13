@@ -234,7 +234,7 @@
 	}
 	
 	//READ Popular STORY
-	function popularStory($userId){
+	function popularStory($userId, $pageNum, $pageCnt){
 		$pageNum = ($pageNum - 1) * $pageCnt;
 		$cnt = 0;
 		
@@ -264,10 +264,98 @@
 		ORDER BY
 			(SELECT sum(cnt)FROM storyClap WHERE storyId = story.storyId)  DESC
 		LIMIT
-			5";
+			$pageNum, $pageCnt";
 
 		$st = $pdo->prepare($query);
 		$st->execute([$userId, $userId]);
+		
+		$st->setFetchMode(PDO::FETCH_ASSOC);
+		$res = $st->fetchAll();
+		
+		foreach($res as $storyId) {
+		
+			$pdo = pdoSqlConnect();
+			$query = 
+			"SELECT
+				contents.contents as SmallText
+			FROM
+				contents
+			WHERE
+				contents.storyId = ?  AND contents.type = 'SmallText'
+			ORDER BY
+				sequence
+			LIMIT 1";
+
+			$st = $pdo->prepare($query);
+			$st->execute([ $storyId['storyId']]);
+			
+			$st->setFetchMode(PDO::FETCH_ASSOC);
+			$contents = $st->fetchAll();
+			$res[$cnt]['text'] = $contents[0]['SmallText'];
+			
+			$pdo = pdoSqlConnect();
+			$query = 
+			"SELECT
+				contents,contents as image
+			FROM
+				contents
+			WHERE
+				contents.storyId = ?  AND contents.type = 'image'
+			ORDER BY
+				sequence
+			LIMIT 1";
+
+			$st = $pdo->prepare($query);
+			$st->execute([ $storyId['storyId']]);
+			
+			$st->setFetchMode(PDO::FETCH_ASSOC);
+			$contents = $st->fetchAll();
+			$res[$cnt]['image'] = $contents[0]['image'];
+			
+			$cnt++;
+		}
+		
+		$st = null;
+		$pdo = null;
+		
+		return $res;
+	}
+	
+	//READ Popular STORY
+	function userStory($userId, $selectUserId,$pageNum, $pageCnt){
+		$pageNum = ($pageNum - 1) * $pageCnt;
+		$cnt = 0;
+		
+		$pdo = pdoSqlConnect();
+		$query = 
+		"SELECT
+			story.storyId,
+			user.userId,
+			user.name,
+			story.title,
+			story.subTitle,
+			story.topicId,
+			topic.topics,
+			publication.publicationId,
+			publication.publications,
+			(SELECT readingList.id FROM readingList WHERE readingList.del = 'N' AND readingList.storyId = story.storyId AND readingList.userId = ?) as readingListId,
+			(SELECT readingList.type FROM readingList WHERE readingList.del = 'N' AND readingList.storyId = story.storyId AND readingList.userId = ?) as readingType,
+			story.createAt
+		FROM
+			story
+			inner join user on story.userId = user.userId
+			left join publicationUser on story.userId = publicationUser.userId
+			left join publication on publicationUser.publicationId = publication.publicationId
+			left join topic on story.topicId = topic.topicId
+		WHERE
+			user.userId = ? AND user.del = 'N' AND story.del = 'N'
+		ORDER BY
+			story.createAt DESC
+		LIMIT
+			$pageNum, $pageCnt";
+
+		$st = $pdo->prepare($query);
+		$st->execute([$userId, $userId, $selectUserId]);
 		
 		$st->setFetchMode(PDO::FETCH_ASSOC);
 		$res = $st->fetchAll();
