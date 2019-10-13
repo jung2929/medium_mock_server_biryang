@@ -88,7 +88,7 @@
 	}
 	
 	//READ detail USER
-	function detailUser($userId)
+	function detailUser($userId, $searchId)
 	{
 		$pdo = pdoSqlConnect();
 		$query =
@@ -97,14 +97,17 @@
             email,
             name,
 			about,
-            image
+            image,
+            (SELECT COUNT(CASE WHEN userId = ? AND followingId = ? AND del = 'N' THEN  1 END ) FROM followUser) isFollow,
+			(SELECT COUNT(CASE WHEN followingId = ? THEN  1 END ) FROM followUser) followersCnt,
+			(SELECT COUNT(CASE WHEN userId = ? THEN 1 END) FROM followUser) followingCnt
 		FROM
 			user
 		WHERE
 			userId = ?";
 
 		$st = $pdo->prepare($query);
-		$st->execute([$userId]);
+		$st->execute([$userId, $searchId, $searchId, $searchId, $searchId]);
 
 		$st->setFetchMode(PDO::FETCH_ASSOC);
 		$res = $st->fetchAll();
@@ -148,36 +151,36 @@
 	}
 	
 	//FOLLOW USER
-	function followUser($followerId, $followingId){
+	function followUser($userId, $followingId){
 		$pdo = pdoSqlConnect();
-		$query = "INSERT INTO followUser (followerId, followingId) VALUES (?, ?);";
+		$query = "INSERT INTO followUser (userId, followingId) VALUES (?, ?);";
 
 		$st = $pdo->prepare($query);
-		$st->execute([$followerId, $followingId]);
+		$st->execute([$userId, $followingId]);
 
 		$st = null;
 		$pdo = null;
 	}
 	
 	//DELETE FOLLOW USER
-	function deleteFollowUser($followerId, $followingId){
+	function deleteFollowUser($userId, $followingId){
 		$pdo = pdoSqlConnect();
-		$query = "UPDATE followUser SET del = 'Y' WHERE followerId = ? AND followingId = ?;";
+		$query = "UPDATE followUser SET del = 'Y' WHERE userId = ? AND followingId = ?;";
 
 		$st = $pdo->prepare($query);
-		$st->execute([$followerId, $followingId]);
+		$st->execute([$userId, $followingId]);
 
 		$st = null;
 		$pdo = null;
 	}
 	
 	//FOLLOW OVERLAP CHECK USER  
-	function overlapCheckFollowUser($followerId, $followingId){
+	function overlapCheckFollowUser($userId, $followingId){
 		$pdo = pdoSqlConnect();
-		$query = "SELECT * FROM followUser WHERE followerId = ? AND followingId = ? AND del = 'N'";
+		$query = "SELECT id FROM followUser WHERE userId = ? AND followingId = ? AND del = 'N'";
 
 		$st = $pdo->prepare($query);
-		$st->execute([$followerId, $followingId]);
+		$st->execute([$userId, $followingId]);
 		
 		$st->setFetchMode(PDO::FETCH_ASSOC);
 		$res = $st->fetchAll();
@@ -189,22 +192,23 @@
 
 	
 	//READ FOLLOWER USER
-	function followerUser($userId){
+	function followerUser($userId, $searchId){
 		$pdo = pdoSqlConnect();
 		$query =
 		"SELECT
 			user.userId,
 			user.name,
-            user.image
+            user.image,
+			(SELECT COUNT(CASE WHEN userId = ? AND followingId = user.userId AND del = 'N' THEN  1 END ) FROM followUser) isFollow
 		FROM
 			followUser
-			inner join user on followUser.followerId = user.userId
+			inner join user on followUser.userId = user.userId
 			
 		WHERE
 			followUser.followingId = ?  AND followUser.del = 'N' AND user.del = 'N'" ;
 
 		$st = $pdo->prepare($query);
-		$st->execute([$userId]);
+		$st->execute([$userId, $searchId]);
 
 		$st->setFetchMode(PDO::FETCH_ASSOC);
 		$res = $st->fetchAll();
@@ -216,21 +220,22 @@
 	}
 	
 	//READ FOLLOWING USER
-	function followingUser($userId){
+	function followingUser($userId, $searchId){
 		$pdo = pdoSqlConnect();
 		$query = 
 		"SELECT
 			user.userId,
 			user.name,
-            user.image
+            user.image,
+			(SELECT COUNT(CASE WHEN userId = ? AND followingId = user.userId AND del = 'N' THEN  1 END ) FROM followUser) isFollow
 		FROM
 			followUser
 			inner join user on followUser.followingId = user.userId
 		WHERE
-			followUser.followerId = ? AND followUser.del = 'N' AND user.del = 'N'" ;
+			followUser.userId = ? AND followUser.del = 'N' AND user.del = 'N'" ;
 
 		$st = $pdo->prepare($query);
-		$st->execute([$userId]);
+		$st->execute([$userId, $searchId]);
 
 		$st->setFetchMode(PDO::FETCH_ASSOC);
 		$res = $st->fetchAll();
@@ -295,7 +300,7 @@
             comment,
 			(SELECT COUNT(CASE WHEN userId = ? AND del = 'N' THEN 1 END) FROM post) postCnt,
 			(SELECT COUNT(CASE WHEN followingId = ? THEN  1 END ) FROM followUser) followerCnt,
-			(SELECT COUNT(CASE WHEN followerId = ? THEN 1 END) FROM followUser) followingCnt
+			(SELECT COUNT(CASE WHEN userId = ? THEN 1 END) FROM followUser) followingCnt
 		FROM
 			user
 		WHERE

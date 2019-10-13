@@ -8,12 +8,15 @@
 	require './pdos/ShowPdo.php';
 	require './pdos/TopicPdo.php';
 	require './pdos/ClapPdo.php';
+	require './pdos/SearchPdo.php';
 	
 	require './vendor/autoload.php'; 
 
 	use \Monolog\Logger as Logger;
 	use Monolog\Handler\StreamHandler;
+	use Firebase\JWT;
 
+	
 	date_default_timezone_set('Asia/Seoul');
 	ini_set('default_charset', 'utf8mb4');
 
@@ -31,16 +34,24 @@
 		$r->addRoute('GET', '/jwt', ['MainController', 'validateJwt']);
 		$r->addRoute('POST', '/jwt', ['MainController', 'createJwt']);
 		
+		$r->addRoute('GET'		, '/search'									, ['SearchController', 'searchType']);
+		$r->addRoute('GET'		, '/story/search'							, ['SearchController', 'searchStory']);
+		$r->addRoute('GET'		, '/topic/search'							, ['SearchController', 'searchTopic']);
+		$r->addRoute('GET'		, '/user/search'							, ['SearchController', 'searchUser']);
+		
 		$r->addRoute('GET'		, '/user/info'								, ['UserController', 'userList']);
 		$r->addRoute('POST'		, '/login'									, ['UserController', 'loginUser']);
 		$r->addRoute('POST'		, '/user'									, ['UserController', 'addUser']);
 		$r->addRoute('GET'		, '/user'									, ['UserController', 'detailUser']);
 		$r->addRoute('DELETE'	, '/user'									, ['UserController', 'deleteUser']);
 		$r->addRoute('PATCH'	, '/user'									, ['UserController', 'updataUser']);
-		$r->addRoute('POST'		, '/user/{userId}/following'				, ['UserController', 'followUser']);
-		$r->addRoute('DELETE'	, '/user/{userId}/following'				, ['UserController', 'deleteFollowUser']);
-		$r->addRoute('GET'		, '/user/{userId}/follower'					, ['UserController', 'followerUser']);
-		$r->addRoute('GET'		, '/user/{userId}/following'				, ['UserController', 'followingUser']);
+		$r->addRoute('GET'		, '/user/{userId}'							, ['UserController', 'detailUser']);
+		
+		$r->addRoute('POST'		, '/following/{followUserId}'				, ['UserController', 'followUser']);
+		$r->addRoute('DELETE'	, '/following/{followUserId}'				, ['UserController', 'deleteFollowUser']);
+		$r->addRoute('GET'		, '/follower/{userId}'						, ['UserController', 'followerUser']);
+		$r->addRoute('GET'		, '/following/{userId}'						, ['UserController', 'followingUser']);
+		
 		$r->addRoute('POST'		, '/user/{userId}/block'					, ['UserController', 'blockUser']);
 		$r->addRoute('DELETE'	, '/user/{userId}/block'					, ['UserController', 'deleteBlockUser']);
 		$r->addRoute('GET'		, '/user/{userId}/block'					, ['UserController', 'blockUserList']);
@@ -67,10 +78,11 @@
 		$r->addRoute('GET'		, '/comment/{commentId}'					, ['CommentController', 'readComment']);
 	
 	
-		$r->addRoute('POST'		, '/readinglist'								, ['RedingListController', 'addReadingList']);
-		$r->addRoute('PATCH'	, '/readinglist/{readingListId}'				, ['RedingListController', 'archiveReadingList']);
-		$r->addRoute('DELETE'	, '/readinglist/{readingListId}'				, ['RedingListController', 'deleteReadingList']);
-		$r->addRoute('GET'		, '/readinglist'								, ['RedingListController', 'readReadingList']);
+		$r->addRoute('POST'		, '/readinglist'							, ['RedingListController', 'addReadingList']);
+		$r->addRoute('PATCH'	, '/readinglist/{readingListId}'			, ['RedingListController', 'archiveReadingList']);
+		$r->addRoute('DELETE'	, '/readinglist/{readingListId}'			, ['RedingListController', 'deleteReadingList']);
+		$r->addRoute('GET'		, '/readinglist'							, ['RedingListController', 'readReadingList']);
+		
 		
 	//    $r->addRoute('GET', '/users', 'get_all_users_handler');
 	//    // {id} must be a number (\d+)
@@ -162,6 +174,11 @@
 					$handler = $routeInfo[1][1];
 					$vars = $routeInfo[2];
 					require './controllers/ClapController.php';
+					break;
+				case 'SearchController':
+					$handler = $routeInfo[1][1];
+					$vars = $routeInfo[2];
+					require './controllers/SearchController.php';
 					break;
 				/*case 'EventController':
 					$handler = $routeInfo[1][1]; $vars = $routeInfo[2];

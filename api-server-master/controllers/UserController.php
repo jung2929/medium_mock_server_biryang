@@ -140,17 +140,16 @@ try {
 		case "detailUser":
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			
-			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
-				$res->isSuccess = FALSE;
-				$res->code = 301;
-				$res->message = "유효하지 않은 토큰입니다";
-				echo json_encode($res, JSON_NUMERIC_CHECK);
-				addErrorLogs($errorLogs, $res, $req);
-				return;
-			}
+			if(!$userId = isValidHeader($jwt, JWT_SECRET_KEY))
+				$userId = 0;
+			
+			if(!empty($vars["userId"]))
+				$searchId = $vars["userId"];
+			else
+				$searchId = $userId;
 			
             http_response_code(200);
-            $res->result = detailUser((int)$userId);
+            $res->result = detailUser($userId, $searchId);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "유저 조회 성공";
@@ -199,7 +198,7 @@ try {
 				return;
 			}
 			
-			if(!empty(overlapCheckFollowUser($vars["userId"], $req->followingId))) {
+			if(!empty(overlapCheckFollowUser($userId, $vars["followUserId"]))) {
 				$res->isSuccess = FALSE;
                 $res->code = 202;
                 $res->message = $res->message . "중복된 데이터가 있습니다.";
@@ -207,10 +206,10 @@ try {
 				echo json_encode($res, JSON_NUMERIC_CHECK);
 				addErrorLogs($errorLogs, $res, $req);
 				return;
-			};
+			}
 		
             http_response_code(200);
-            followUser($vars["userId"], $req->followingId);
+            followUser($userId, $vars["followUserId"]);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "팔로우 추가 성공";
@@ -234,8 +233,18 @@ try {
 				return;
 			}
 			
+			if(empty(overlapCheckFollowUser($userId, $vars["followUserId"]))) {
+				$res->isSuccess = FALSE;
+                $res->code = 202;
+                $res->message = $res->message . "권한이 없습니다.";
+			
+				echo json_encode($res, JSON_NUMERIC_CHECK);
+				addErrorLogs($errorLogs, $res, $req);
+				return;
+			}
+			
             http_response_code(200);
-            deleteFollowUser($vars["userId"], $req->followingId);
+            deleteFollowUser($userId, $vars["followUserId"]);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "팔로우 삭제 성공";
@@ -250,17 +259,16 @@ try {
 		case "followingUser":
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			
-			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
-				$res->isSuccess = FALSE;
-				$res->code = 301;
-				$res->message = "유효하지 않은 토큰입니다";
-				echo json_encode($res, JSON_NUMERIC_CHECK);
-				addErrorLogs($errorLogs, $res, $req);
-				return;
-			}
+			if(!$userId = isValidHeader($jwt, JWT_SECRET_KEY))
+				$userId = 0;
+			
+			if(!empty($vars["userId"]))
+				$searchId = $vars["userId"];
+			else
+				$searchId = $userId;
 			
             http_response_code(200);
-            $res->result = followingUser($vars["userId"]);
+            $res->result = followingUser($userId, $searchId);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "팔로잉 조회 성공";
@@ -275,17 +283,16 @@ try {
 		case "followerUser":
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			
-			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
-				$res->isSuccess = FALSE;
-				$res->code = 301;
-				$res->message = "유효하지 않은 토큰입니다";
-				echo json_encode($res, JSON_NUMERIC_CHECK);
-				addErrorLogs($errorLogs, $res, $req);
-				return;
-			}
+			if(!$userId = isValidHeader($jwt, JWT_SECRET_KEY))
+				$userId = 0;
+			
+			if(!empty($vars["userId"]))
+				$searchId = $vars["userId"];
+			else
+				$searchId = $userId;
 			
             http_response_code(200);
-            $res->result = followerUser($vars["userId"]);
+            $res->result = followerUser($userId, $searchId);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "팔로워 조회 성공";

@@ -11,6 +11,7 @@ try {
     switch ($handler) {
         case "index":
             echo "API Server";
+			echo jsonDecode("ya29.Il-bB23hJtDapAxHwZiDjciPSLfXFQEobbBNJB41cCwAo6r1k7vr-kFGW_GI6s-PMJ1az0zmr8KAwwzqirXc9iDJxxERefvL8klElVI3EvV2X-1fDoJSIphno5Cjx3U3tA");
             break;
         case "ACCESS_LOGS":
             //            header('content-type text/html charset=utf-8');
@@ -29,7 +30,7 @@ try {
          */
         case "test":
             http_response_code(200);
-            $res->result = test();
+            //$res->result = test();
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "테스트 성공";
