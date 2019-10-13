@@ -143,11 +143,11 @@
 			$pdo = pdoSqlConnect();
 			$query = 
 			"SELECT
-				contents,contents as text
+				contents,contents as SmallText
 			FROM
 				contents
 			WHERE
-				contents.storyId = ?  AND contents.type = 'text'
+				contents.storyId = ?  AND contents.type = 'SmallText'
 			ORDER BY
 				sequence
 			LIMIT 1";
@@ -157,7 +157,7 @@
 			
 			$st->setFetchMode(PDO::FETCH_ASSOC);
 			$contents = $st->fetchAll();
-			$res[$cnt]['text'] = $contents[0]['text'];
+			$res[$cnt]['text'] = $contents[0]['SmallText'];
 			
 			$pdo = pdoSqlConnect();
 			$query = 

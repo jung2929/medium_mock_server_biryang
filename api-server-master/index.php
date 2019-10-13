@@ -63,6 +63,7 @@
 		
 		$r->addRoute('GET'		, '/story'									, ['ShowController', 'recentlyStory']);
 		$r->addRoute('GET'		, '/recentlylist'							, ['ShowController', 'recentlyList']);
+		$r->addRoute('GET'		, '/popularlist'							, ['ShowController', 'popularStory']);
 		$r->addRoute('POST'		, '/story/{storyId}/clap'					, ['ClapController', 'addClap']);
 			
 		$r->addRoute('POST'		, '/topic'									, ['TopicController', 'addTopic']);
