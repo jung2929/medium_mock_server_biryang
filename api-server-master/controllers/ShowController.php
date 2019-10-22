@@ -33,11 +33,18 @@ try {
 
 			$pageNum = $_GET['pageNum'];
 			$pageCnt = $_GET['pageCnt'];
+			$sort = strtoupper($_GET['sort']);
 						
 			if(empty($pageNum))
 				$res->message = "<pageNum> 공백입니다.".$res->message;
 			if(empty($pageCnt))
 				$res->message = "<pageCnt> 공백입니다.".$res->message;
+			if(empty($sort)) {
+				$sort = "DESC";
+			}
+			else if ( strtoupper($sort) != "ASC" AND strtoupper($sort) != "DESC"){
+				$res->message = "<sort> asc, desc 가 아닙니다.".$res->message;
+			}
 			
 			if(empty(!$res->message)){
 				$res->isSuccess = FALSE;
@@ -52,7 +59,7 @@ try {
 			}
 			
             http_response_code(200);
-            $res->result = recentlyStory($userId,$pageNum, $pageCnt);
+            $res->result = recentlyStory($userId, $pageNum, $pageCnt, $sort);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "최근 스토리 조회 성공";
@@ -68,6 +75,7 @@ try {
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			$pageNum = $_GET['pageNum'];
 			$pageCnt = $_GET['pageCnt'];
+			$sort = strtoupper($_GET['sort']);
 			
 			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
 				$res->isSuccess = FALSE;
@@ -82,6 +90,12 @@ try {
 				$res->message = "<pageNum> 공백입니다.".$res->message;
 			if(empty($pageCnt))
 				$res->message = "<pageCnt> 공백입니다.".$res->message;
+			if(empty($sort)) {
+				$sort = "DESC";
+			}
+			else if ( strtoupper($sort) != "ASC" AND strtoupper($sort) != "DESC"){
+				$res->message = "<sort> asc, desc 가 아닙니다.".$res->message;
+			}
 			
 			if(empty(!$res->message)){
 				$res->isSuccess = FALSE;
@@ -92,7 +106,7 @@ try {
 			}
 			
             http_response_code(200);
-            $res->result = recentlyList($userId, $pageNum, $pageCnt);
+            $res->result = recentlyList($userId, $pageNum, $pageCnt, $sort);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "최근 스토리 조회 성공";
@@ -103,6 +117,7 @@ try {
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			$pageNum = $_GET['pageNum'];
 			$pageCnt = $_GET['pageCnt'];
+			$sort = strtoupper($_GET['sort']);
 			
 			if(empty($pageNum))
 				$pageNum = 1;
@@ -111,10 +126,17 @@ try {
 			
 			if (!$userId = isValidHeader($jwt, JWT_SECRET_KEY)) {
 				$userId = 0;
-			}		
+			}
+
+			if(empty($sort)) {
+				$sort = "DESC";
+			}
+			else if ( strtoupper($sort) != "ASC" AND strtoupper($sort) != "DESC"){
+				$res->message = "<sort> asc, desc 가 아닙니다.".$res->message;
+			}
 			
             http_response_code(200);
-            $res->result = popularStory($userId, $pageNum, $pageCnt);
+            $res->result = popularStory($userId, $pageNum, $pageCnt, $sort);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "인기 스토리 조회 성공";
@@ -125,6 +147,7 @@ try {
 			$jwt = $_SERVER["HTTP_X_ACCESS_TOKEN"];
 			$pageNum = $_GET['pageNum'];
 			$pageCnt = $_GET['pageCnt'];
+			$sort = strtoupper($_GET['sort']);
 			
 			if(empty($pageNum))
 				$pageNum = 1;
@@ -135,8 +158,15 @@ try {
 				$userId = 0;
 			}
 			
+			if(empty($sort)) {
+				$sort = "DESC";
+			}
+			else if ( strtoupper($sort) != "ASC" AND strtoupper($sort) != "DESC"){
+				$res->message = "<sort> asc, desc 가 아닙니다.".$res->message;
+			}
+			
             http_response_code(200);
-            $res->result = userStory($userId, $vars['userId'], $pageNum, $pageCnt);
+            $res->result = userStory($userId, $vars['userId'], $pageNum, $pageCnt, $sort);
             $res->isSuccess = TRUE;
             $res->code = 100;
             $res->message = "스토리 조회 성공";

@@ -57,7 +57,7 @@
 	
 	
 	//READ STORY
-	function recentlyStory($userId, $pageNum, $pageCnt){
+	function recentlyStory($userId, $pageNum, $pageCnt, $sort){
 		$pageNum = ($pageNum - 1) * $pageCnt;
 		$cnt = 0;
 		
@@ -85,7 +85,7 @@
 		WHERE
 			user.del = 'N' AND story.del = 'N'
 		ORDER BY
-			story.createAt DESC
+			story.createAt $sort
 		LIMIT
 			$pageNum, $pageCnt";
 
@@ -145,7 +145,7 @@
 	}
 	
 	//READ STORY
-	function recentlyList($userId, $pageNum, $pageCnt){
+	function recentlyList($userId, $pageNum, $pageCnt, $sort){
 		$pageNum = ($pageNum - 1) * $pageCnt;
 		$cnt = 0;
 		
@@ -174,7 +174,7 @@
 		WHERE
 			recentlyList.userId = ? AND user.del = 'N' AND story.del = 'N'
 		ORDER BY
-			recentlyList.recentlyAt DESC
+			recentlyList.recentlyAt $sort
 		LIMIT
 			$pageNum, $pageCnt";
 
@@ -234,7 +234,7 @@
 	}
 	
 	//READ Popular STORY
-	function popularStory($userId, $pageNum, $pageCnt){
+	function popularStory($userId, $pageNum, $pageCnt, $sort){
 		$pageNum = ($pageNum - 1) * $pageCnt;
 		$cnt = 0;
 		
@@ -262,7 +262,7 @@
 		WHERE
 			user.del = 'N' AND story.del = 'N'
 		ORDER BY
-			(SELECT sum(cnt)FROM storyClap WHERE storyId = story.storyId)  DESC
+			(SELECT sum(cnt)FROM storyClap WHERE storyId = story.storyId)  $sort
 		LIMIT
 			$pageNum, $pageCnt";
 
@@ -322,7 +322,7 @@
 	}
 	
 	//READ Popular STORY
-	function userStory($userId, $selectUserId,$pageNum, $pageCnt){
+	function userStory($userId, $selectUserId,$pageNum, $pageCnt, $sort){
 		$pageNum = ($pageNum - 1) * $pageCnt;
 		$cnt = 0;
 		
@@ -350,7 +350,7 @@
 		WHERE
 			user.userId = ? AND user.del = 'N' AND story.del = 'N'
 		ORDER BY
-			story.createAt DESC
+			story.createAt $sort
 		LIMIT
 			$pageNum, $pageCnt";
 
